@@ -37,18 +37,22 @@ public class CDIProviderRegisteringComponentsDeltaSpikeTest extends
 
 		// now we gonna boot the CDI container. This will trigger the classpath scan, etc
 		cdiContainer.boot();
+		CDIBasedContainer vraptorContainer = new CDIBasedContainer(cdiContainer.getBeanManager());
 
 		// and finally we like to start all built-in contexts
-		cdiContainer.getContextControl().startContexts();
-		Bean<?> bean = cdiContainer.getBeanManager().getBeans(XStreamConverters.class).iterator().next();
-		System.out.println(bean.getScope());
-
+		cdiContainer.getContextControl().startContext(RequestScoped.class);
+		DisposableComponent instance = vraptorContainer.instanceFor(DisposableComponent.class);
+		System.out.println(instance.isDestroyed());
+//		Bean<?> bean = cdiContainer.getBeanManager().getBeans(CDIBasedContainer.class).iterator().next();
+//		System.out.println(bean.getScope());
+		cdiContainer.getContextControl().stopContext(RequestScoped.class);
+		
 		// now we can use CDI in our SE application. 
 		// And there is not a single line of OWB or Weld specific code in your project!
 		// finally we gonna stop the container 
 		cdiContainer.shutdown();		
 	}
-	
+		
 	private int counter;
 	@Inject
 	private BeanManager beanManager;

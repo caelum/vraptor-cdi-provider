@@ -68,7 +68,6 @@ public class TestExtension implements Extension{
 			boolean isInterceptorHandlerFactorty = entry.getValue().equals(
 					DefaultInterceptorHandlerFactory.class);
 			if (!isProxyInitializer && !isInterceptorHandlerFactorty) {
-				System.out.println(entry);
 				cdiRegistry.register(entry.getKey(), entry.getValue());
 			}
 		}
