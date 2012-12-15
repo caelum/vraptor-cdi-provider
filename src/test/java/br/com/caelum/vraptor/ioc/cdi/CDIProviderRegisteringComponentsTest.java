@@ -1,45 +1,32 @@
 package br.com.caelum.vraptor.ioc.cdi;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Field;
+import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
-import javax.enterprise.inject.spi.AnnotatedType;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
 
 import org.apache.deltaspike.cdise.api.CdiContainer;
 import org.apache.deltaspike.cdise.api.CdiContainerLoader;
+import org.apache.deltaspike.cdise.weld.ContextController;
 import org.hamcrest.MatcherAssert;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import com.google.common.base.Objects;
-
-import br.com.caelum.vraptor.Result;
-import br.com.caelum.vraptor.core.Execution;
 import br.com.caelum.vraptor.core.RequestInfo;
-import br.com.caelum.vraptor.http.MutableRequest;
-import br.com.caelum.vraptor.http.MutableResponse;
 import br.com.caelum.vraptor.ioc.Container;
 import br.com.caelum.vraptor.ioc.ContainerProvider;
-import br.com.caelum.vraptor.ioc.MySessionComponent;
 import br.com.caelum.vraptor.ioc.WhatToDo;
 import br.com.caelum.vraptor.ioc.fixture.ComponentFactoryInTheClasspath;
 import br.com.caelum.vraptor.ioc.fixture.CustomComponentWithLifecycleInTheClasspath;
 import br.com.caelum.vraptor.ioc.spring.SpringProviderRegisteringComponentsTest;
 import br.com.caelum.vraptor.ioc.spring.VRaptorRequestHolder;
-import br.com.caelum.vraptor.test.HttpServletRequestMock;
-import br.com.caelum.vraptor.test.HttpSessionMock;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertThat;
-
-import static org.mockito.Mockito.mock;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -64,8 +51,11 @@ public class CDIProviderRegisteringComponentsTest extends
 		test.startContexts();
 		ContainerProvider provider = test.getProvider();
 		provider.start(test.servletContainerFactory.createServletContext());
-//		Object instance = test.actualInstance(provider.getContainer().instanceFor(MeuTeste.class));
-//		System.out.println(cdiContainer.getBeanManager().getBeans(MeuTeste.class).iterator().next().getScope());
+		MyRequestComponent component = provider.getContainer().instanceFor(MyRequestComponent.class);
+		component.toString();
+		Map<String, Object> req = test.getRequestMap();
+		System.out.println(req.keySet());
+//		System.out.println(cdiContainer.getBeanManager().getBeans(BoundRequestContext.class).iterator().next().getScope());
 //		System.out.println(instance);
 		test.stopContexts();
 		//shutdownCDIContainer();
@@ -80,6 +70,21 @@ public class CDIProviderRegisteringComponentsTest extends
 		cdiContainer.getContextControl().startContexts();
 	}
 
+	public Map<String,Object> getRequestMap(){
+		try{
+			Field contextControl = cdiContainer.getContextControl().getClass().getDeclaredField("contextController");
+			contextControl.setAccessible(true);
+			ContextController contextController = (ContextController) contextControl.get(cdiContainer.getContextControl());
+			Field fieldRequestMap = contextController.getClass().getDeclaredField("requestMap");
+			fieldRequestMap.setAccessible(true);
+			Map<String, Object> requestMap = (Map<String, Object>) fieldRequestMap.get(contextController);
+			return requestMap;
+			
+		}catch(Exception e){
+			throw new RuntimeException(e);
+		}
+	}
+	
 	public void stopContexts() {
 		cdiContainer.getContextControl().stopContexts();
 	}

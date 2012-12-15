@@ -3,9 +3,13 @@ package br.com.caelum.vraptor.ioc.cdi;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.AfterDeploymentValidation;
+import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
+
+import org.jboss.weld.bootstrap.events.ProcessAnnotatedTypeImpl;
+import org.jboss.weld.manager.BeanManagerImpl;
 
 import br.com.caelum.vraptor.core.RequestInfo;
 import br.com.caelum.vraptor.ioc.GenericContainerTest;
@@ -28,7 +32,8 @@ public class TestExtension implements Extension{
 		CDIRegistry registry = new CDIRegistry(discovery, bm);
 		registry.configure();
 		//just test objects
-		discovery.addAnnotatedType(bm.createAnnotatedType(ServletContainerFactory.class));
+		AnnotatedType<ServletContainerFactory> containerType = bm.createAnnotatedType(ServletContainerFactory.class);
+		discovery.addAnnotatedType(containerType);
 		discovery.addAnnotatedType(bm.createAnnotatedType(DummyComponentFactory.class));
 		discovery.addAnnotatedType(bm.createAnnotatedType(TheComponentFactory.class));
 		discovery.addAnnotatedType(bm.createAnnotatedType(ComponentFactoryInTheClasspath.class));

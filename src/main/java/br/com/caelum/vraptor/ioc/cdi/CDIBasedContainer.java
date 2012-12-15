@@ -32,7 +32,7 @@ public class CDIBasedContainer implements Container, ComponentRegistry {
 	public <T> T instanceFor(Class<T> type) {
 		Set beans = beanManager.getBeans(type);
 		//TODO use resolve instead of iterator.next()
-		Bean bean = (Bean) beans.iterator().next();
+		Bean bean = (Bean) beanManager.resolve(beans);
 		CreationalContext ctx = beanManager.createCreationalContext(bean);
 		return (T) beanManager.getReference(bean, type, ctx);
 	}
