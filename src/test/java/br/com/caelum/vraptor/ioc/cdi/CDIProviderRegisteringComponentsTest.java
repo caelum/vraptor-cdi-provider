@@ -1,159 +1,102 @@
 package br.com.caelum.vraptor.ioc.cdi;
 
-import java.util.Map.Entry;
+import java.lang.annotation.Annotation;
 import java.util.concurrent.Callable;
 
-import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
-import javax.enterprise.inject.Produces;
-import javax.enterprise.inject.spi.BeanManager;
-import javax.enterprise.inject.spi.Extension;
-import javax.inject.Inject;
-import javax.servlet.FilterChain;
-import javax.servlet.ServletContext;
+import javax.enterprise.inject.spi.AnnotatedType;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
-import org.jboss.arquillian.container.test.api.Deployment;
-import org.jboss.arquillian.junit.Arquillian;
-import org.jboss.shrinkwrap.api.ShrinkWrap;
-import org.jboss.shrinkwrap.api.asset.EmptyAsset;
-import org.jboss.shrinkwrap.api.spec.JavaArchive;
-import org.jboss.weld.context.bound.BoundRequestContext;
+import org.apache.deltaspike.cdise.api.CdiContainer;
+import org.apache.deltaspike.cdise.api.CdiContainerLoader;
+import org.hamcrest.MatcherAssert;
+import org.junit.AfterClass;
+import org.junit.BeforeClass;
+import org.junit.Ignore;
 import org.junit.Test;
-import org.junit.runner.RunWith;
 
-import br.com.caelum.vraptor.ComponentRegistry;
-import br.com.caelum.vraptor.converter.jodatime.LocalDateConverter;
-import br.com.caelum.vraptor.converter.jodatime.LocalTimeConverter;
-import br.com.caelum.vraptor.core.BaseComponents;
-import br.com.caelum.vraptor.core.DefaultInterceptorHandlerFactory;
-import br.com.caelum.vraptor.core.DefaultMethodInfo;
-import br.com.caelum.vraptor.core.JstlLocalization;
+import com.google.common.base.Objects;
+
+import br.com.caelum.vraptor.Result;
+import br.com.caelum.vraptor.core.Execution;
 import br.com.caelum.vraptor.core.RequestInfo;
-import br.com.caelum.vraptor.http.EncodingHandlerFactory;
 import br.com.caelum.vraptor.http.MutableRequest;
 import br.com.caelum.vraptor.http.MutableResponse;
-import br.com.caelum.vraptor.interceptor.DefaultInterceptorRegistry;
-import br.com.caelum.vraptor.interceptor.TopologicalSortedInterceptorRegistry;
+import br.com.caelum.vraptor.ioc.Container;
 import br.com.caelum.vraptor.ioc.ContainerProvider;
-import br.com.caelum.vraptor.ioc.FakeInterceptorHandlerFactory;
-import br.com.caelum.vraptor.ioc.GenericContainerTest;
 import br.com.caelum.vraptor.ioc.MySessionComponent;
-import br.com.caelum.vraptor.ioc.NeedsCustomInstantiation;
-import br.com.caelum.vraptor.ioc.TheComponentFactory;
 import br.com.caelum.vraptor.ioc.WhatToDo;
 import br.com.caelum.vraptor.ioc.fixture.ComponentFactoryInTheClasspath;
-import br.com.caelum.vraptor.ioc.fixture.CustomComponentInTheClasspath;
 import br.com.caelum.vraptor.ioc.fixture.CustomComponentWithLifecycleInTheClasspath;
-import br.com.caelum.vraptor.ioc.fixture.DependentOnSomethingFromComponentFactory;
 import br.com.caelum.vraptor.ioc.spring.SpringProviderRegisteringComponentsTest;
 import br.com.caelum.vraptor.ioc.spring.VRaptorRequestHolder;
-import br.com.caelum.vraptor.serialization.HibernateProxyInitializer;
-import br.com.caelum.vraptor.serialization.NullProxyInitializer;
 import br.com.caelum.vraptor.test.HttpServletRequestMock;
 import br.com.caelum.vraptor.test.HttpSessionMock;
-import br.com.caelum.vraptor.util.test.MockLocalization;
+
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertSame;
+import static org.junit.Assert.assertThat;
+
 import static org.mockito.Mockito.mock;
 
-@RunWith(Arquillian.class)
+import static org.hamcrest.Matchers.equalTo;
+import static org.hamcrest.Matchers.is;
+import static org.hamcrest.Matchers.not;
+
 public class CDIProviderRegisteringComponentsTest extends
 		SpringProviderRegisteringComponentsTest {
 
-	private int counter;
-	@Inject
-	private BeanManager beanManager;
-	private @Inject BoundRequestContext requestContext;	
+	private static CdiContainer cdiContainer;
+	private ServletContainerFactory servletContainerFactory = new ServletContainerFactory();
 
-	@Produces
-	@SessionScoped
-	public HttpSessionMock getSession() {
-		return new HttpSessionMock(context, "session" + ++counter);
+	@BeforeClass
+	public static void startCDIContainer() {
+		cdiContainer = CdiContainerLoader.getCdiContainer();
+		cdiContainer.boot();
+		
+	}
+	
+	public static void main(String[] args) throws Exception {
+		startCDIContainer();		
+		CDIProviderRegisteringComponentsTest test = new CDIProviderRegisteringComponentsTest();
+		test.startContexts();
+		ContainerProvider provider = test.getProvider();
+		provider.start(test.servletContainerFactory.createServletContext());
+//		Object instance = test.actualInstance(provider.getContainer().instanceFor(MeuTeste.class));
+//		System.out.println(cdiContainer.getBeanManager().getBeans(MeuTeste.class).iterator().next().getScope());
+//		System.out.println(instance);
+		test.stopContexts();
+		//shutdownCDIContainer();
 	}
 
-	@Produces
-	@RequestScoped
-	public HttpServletRequestMock getRequest() {
-		return new HttpServletRequestMock(getSession(), mock(
-				MutableRequest.class, "request" + counter));
+	@AfterClass
+	public static void shutdownCDIContainer() {
+		cdiContainer.shutdown();
 	}
 
-	@Produces
-	@RequestScoped
-	public final MutableResponse getResponse() {
-		return mock(MutableResponse.class, "response" + counter);
+	public void startContexts() {
+		cdiContainer.getContextControl().startContexts();
 	}
 
-	@Produces
-	@RequestScoped
-	public FilterChain getFilterChain() {
-		return mock(FilterChain.class);
+	public void stopContexts() {
+		cdiContainer.getContextControl().stopContexts();
 	}
 
-	@Produces
-	@ApplicationScoped
-	public ServletContext producesServletContext() {
-		return this.context;
+	public void start(Class<? extends Annotation> scope) {
+		cdiContainer.getContextControl().startContext(scope);
 	}
 
-	@Deployment
-	public static JavaArchive createDeployment() {
-		JavaArchive jar = ShrinkWrap.create(JavaArchive.class);
-		jar.addPackages(true, "com.thoughtworks.paranamer", "net.sf.cglib",
-				"com.thoughtworks.xstream");
-		for (Entry<Class<?>, Class<?>> entry : BaseComponents
-				.getApplicationScoped().entrySet()) {
-			boolean isProxyInitializer = entry.getValue().equals(
-					HibernateProxyInitializer.class);
-			boolean isInterceptorHandlerFactorty = entry.getValue().equals(
-					DefaultInterceptorHandlerFactory.class);
-			if (!isProxyInitializer && !isInterceptorHandlerFactorty) {
-				jar.addClasses(entry.getKey(), entry.getValue());
-			}
-		}
-		for (Entry<Class<?>, Class<?>> entry : BaseComponents
-				.getRequestScoped().entrySet()) {
-			if (!entry.getValue().equals(JstlLocalization.class)) {
-				jar.addClasses(entry.getKey(), entry.getValue());
-			}
-		}
-		for (Entry<Class<?>, Class<?>> entry : BaseComponents
-				.getPrototypeScoped().entrySet()) {
-			jar.addClasses(entry.getKey(), entry.getValue());
-		}
-		jar.addClasses(ComponentRegistry.class, CDIRegistry.class);
-		jar.addClasses(GenericContainerTest.MyAppComponent.class);
-		jar.addClasses(GenericContainerTest.MyAppComponentWithLifecycle.class);
-		jar.addClasses(GenericContainerTest.MyRequestComponent.class);
-		jar.addClasses(GenericContainerTest.MyPrototypeComponent.class);
-		jar.addClasses(GenericContainerTest.DisposableComponent.class);
-		jar.addClasses(GenericContainerTest.StartableComponent.class);
-		jar.addClasses(CustomComponentInTheClasspath.class);
-		jar.addClasses(ComponentFactoryInTheClasspath.Provided.class);
-		jar.addClasses(CustomComponentWithLifecycleInTheClasspath.class);
-		jar.addClass(ComponentFactoryInTheClasspath.class);
-		jar.addClass(EncodingHandlerFactory.class);
-		jar.addClass(DefaultMethodInfo.class);
-		jar.addClass(LocalDateConverter.class);
-		jar.addClass(LocalTimeConverter.class);
-		jar.addClass(DefaultInterceptorRegistry.class);
-		jar.addClass(NullProxyInitializer.class);
-		jar.addClasses(CDIBasedContainer.class);
-		jar.addClasses(FakeInterceptorHandlerFactory.class);
-		jar.addClass(TopologicalSortedInterceptorRegistry.class);
-		jar.addClass(MySessionComponent.class);
-		jar.addClass(TheComponentFactory.class);
-		jar.addClass(RequestInfo.class);
-		jar.addClass(NeedsCustomInstantiation.class);
-		jar.addClass(DependentOnSomethingFromComponentFactory.class);
-		jar.addClass(MockLocalization.class);
-		jar.addAsManifestResource(EmptyAsset.INSTANCE, "beans.xml").addAsServiceProvider(Extension.class,CDIRegistry.class);
-		return jar;
+	public void stop(Class<? extends Annotation> scope) {
+		cdiContainer.getContextControl().stopContext(scope);
 	}
+
 
 	@Override
 	protected ContainerProvider getProvider() {
 		CDIProvider cdiProvider = new CDIProvider();
-		cdiProvider.setBeanManager(beanManager);
+		cdiProvider.setBeanManager(cdiContainer.getBeanManager());
 		return cdiProvider;
 	}
 
@@ -161,37 +104,101 @@ public class CDIProviderRegisteringComponentsTest extends
 	protected <T> T executeInsideRequest(final WhatToDo<T> execution) {
 		Callable<T> task = new Callable<T>() {
 			public T call() throws Exception {
-				T result = null;
+				start(RequestScoped.class);
+				start(SessionScoped.class);				
 				RequestInfo request = new RequestInfo(context, null,
-						getRequest(), getResponse());
+						servletContainerFactory.getRequest(),
+						servletContainerFactory.getResponse());
 				VRaptorRequestHolder.setRequestForCurrentThread(request);
-				
-				result = execution.execute(request, counter);
+
+				T result = execution.execute(request, counter);
 
 				VRaptorRequestHolder.resetRequestForCurrentThread();
+				stop(SessionScoped.class);
+				stop(RequestScoped.class);
 				return result;
 			}
 		};
 		try {
-			return task.call();
+			T call = task.call();
+			return call;
 		} catch (Exception e) {
 			throw new RuntimeException(e);
 		}
 	}
+
+	private Object actualInstance(Object instance) {		
+		try {
+			//Weld proxy is a lazy bitch
+			instance.toString();
+			java.lang.reflect.Field field = instance.getClass()
+					.getDeclaredField("BEAN_INSTANCE_CACHE");
+			field.setAccessible(true);
+			ThreadLocal mapa = (ThreadLocal) field.get(instance);
+			return mapa.get();
+		} catch (Exception exception) {
+			return instance;
+		}
+	}
+	
+	protected <T> T instanceFor(final Class<T> component,
+			Container container) {
+		T maybeAWeldProxy = container.instanceFor(component);
+		return (T)actualInstance(maybeAWeldProxy);
+	}	
+
+	@Override
+	protected void checkSimilarity(Class<?> component, boolean shouldBeTheSame,
+			Object firstInstance, Object secondInstance) {
+		if (shouldBeTheSame) {
+			MatcherAssert.assertThat("Should be the same instance for "
+					+ component.getName(), actualInstance(firstInstance),
+					is(equalTo(actualInstance(secondInstance))));
+		} else {
+			MatcherAssert.assertThat("Should not be the same instance for "
+					+ component.getName(), actualInstance(firstInstance),
+					is(not(equalTo(actualInstance(secondInstance)))));
+		}
+	}
 	
 	@Test
-	public void shouldDisposeAfterRequest() {
-		requestContext.activate();
-		DisposableComponent comp = provider.getContainer().instanceFor(DisposableComponent.class);
-		requestContext.invalidate();
-		requestContext.deactivate();
+	public void callsPredestroyExactlyOneTime() throws Exception {
 		
-		requestContext.activate();
-		DisposableComponent comp2 = provider.getContainer().instanceFor(DisposableComponent.class);
-		requestContext.invalidate();
-		requestContext.deactivate();
-		System.out.println(comp==comp2);
-//		assertTrue(comp.isDestroyed());
+		MyAppComponentWithLifecycle component = registerAndGetFromContainer(MyAppComponentWithLifecycle.class,
+				MyAppComponentWithLifecycle.class);		
+		assertThat(component.getCalls(), is(0));
+		shutdownCDIContainer();
+		assertThat(component.getCalls(), is(1));
+		startCDIContainer();
+		
+	}
+	
+	@Test
+	public void shoudCallPredestroyExactlyOneTimeForComponentsScannedFromTheClasspath() {
+		CustomComponentWithLifecycleInTheClasspath component = getFromContainer(CustomComponentWithLifecycleInTheClasspath.class);
+		assertThat(component.getCallsToPreDestroy(), is(equalTo(0)));
+		shutdownCDIContainer();
+		assertThat(component.getCallsToPreDestroy(), is(equalTo(1)));
+		startCDIContainer();
+	}
+
+	@Test
+	public void shoudCallPredestroyExactlyOneTimeForComponentFactoriesScannedFromTheClasspath() {
+		ComponentFactoryInTheClasspath componentFactory = getFromContainer(ComponentFactoryInTheClasspath.class);
+		assertThat(componentFactory.getCallsToPreDestroy(), is(equalTo(0)));
+		shutdownCDIContainer();
+		assertThat(componentFactory.getCallsToPreDestroy(), is(equalTo(1)));
+
+		startCDIContainer();
+	}
+	
+	@Ignore
+	public void setsAnAttributeOnRequestWithTheObjectTypeName() throws Exception {
+	}
+	
+	@Ignore
+	public void setsAnAttributeOnSessionWithTheObjectTypeName() throws Exception {
 	}	
+	
 
 }

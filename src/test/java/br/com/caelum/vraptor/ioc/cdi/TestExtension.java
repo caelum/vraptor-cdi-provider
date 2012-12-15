@@ -1,13 +1,25 @@
 package br.com.caelum.vraptor.ioc.cdi;
 
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Map.Entry;
+import java.util.Set;
 
+import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Instance;
 import javax.enterprise.inject.spi.AfterBeanDiscovery;
+import javax.enterprise.inject.spi.AfterDeploymentValidation;
+import javax.enterprise.inject.spi.AnnotatedType;
+import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
+import javax.enterprise.inject.spi.ProcessAnnotatedType;
+import javax.enterprise.inject.spi.ProcessBean;
+import javax.enterprise.inject.spi.ProcessManagedBean;
 import javax.enterprise.inject.spi.ProcessProducer;
+import javax.inject.Inject;
 
 import br.com.caelum.vraptor.ComponentRegistry;
 import br.com.caelum.vraptor.converter.jodatime.LocalDateConverter;
@@ -21,15 +33,22 @@ import br.com.caelum.vraptor.core.Localization;
 import br.com.caelum.vraptor.core.RequestInfo;
 import br.com.caelum.vraptor.http.EncodingHandlerFactory;
 import br.com.caelum.vraptor.interceptor.DefaultInterceptorRegistry;
+import br.com.caelum.vraptor.ioc.Component;
 import br.com.caelum.vraptor.ioc.Container;
 import br.com.caelum.vraptor.ioc.FakeInterceptorHandlerFactory;
 import br.com.caelum.vraptor.ioc.GenericContainerTest;
+import br.com.caelum.vraptor.ioc.GenericContainerTest.DisposableComponent;
 import br.com.caelum.vraptor.ioc.MySessionComponent;
+import br.com.caelum.vraptor.ioc.ResourceHandler;
+import br.com.caelum.vraptor.ioc.StereotypeHandler;
 import br.com.caelum.vraptor.ioc.TheComponentFactory;
 import br.com.caelum.vraptor.ioc.fixture.ComponentFactoryInTheClasspath;
+import br.com.caelum.vraptor.ioc.fixture.ConverterInTheClasspath;
 import br.com.caelum.vraptor.ioc.fixture.CustomComponentInTheClasspath;
 import br.com.caelum.vraptor.ioc.fixture.CustomComponentWithLifecycleInTheClasspath;
 import br.com.caelum.vraptor.ioc.fixture.DependentOnSomethingFromComponentFactory;
+import br.com.caelum.vraptor.ioc.fixture.InterceptorInTheClasspath;
+import br.com.caelum.vraptor.ioc.fixture.ResourceInTheClasspath;
 import br.com.caelum.vraptor.ioc.spring.components.DummyComponentFactory;
 import br.com.caelum.vraptor.serialization.HibernateProxyInitializer;
 import br.com.caelum.vraptor.serialization.NullProxyInitializer;
@@ -40,27 +59,23 @@ import br.com.caelum.vraptor.validator.MethodValidatorCreator;
 import br.com.caelum.vraptor.validator.ValidatorCreator;
 import br.com.caelum.vraptor.validator.ValidatorFactoryCreator;
 
+//TODO tem que tomar cuidado para não registrar o mesmo objeto duas vezes. Infelizmente o beforeBean não permite registrar
 public class TestExtension implements Extension{
-	
-	public void processProducer(@Observes ProcessProducer<?, ?> ppd, BeanManager bm) {
-	}
 	
 	public void beforeBeanDiscovey(@Observes BeforeBeanDiscovery discovery, BeanManager bm) {
 		discovery.addAnnotatedType(bm.createAnnotatedType(ServletContainerFactory.class));
-		discovery.addAnnotatedType(bm.createAnnotatedType(MessageInterpolatorFactory.class));
-		discovery.addAnnotatedType(bm.createAnnotatedType(ValidatorFactoryCreator.class));
-		discovery.addAnnotatedType(bm.createAnnotatedType(EncodingHandlerFactory.class));
-		discovery.addAnnotatedType(bm.createAnnotatedType(ValidatorCreator.class));
 		discovery.addAnnotatedType(bm.createAnnotatedType(DummyComponentFactory.class));
-		discovery.addAnnotatedType(bm.createAnnotatedType(MethodValidatorCreator.class));
 		discovery.addAnnotatedType(bm.createAnnotatedType(TheComponentFactory.class));
 		discovery.addAnnotatedType(bm.createAnnotatedType(ComponentFactoryInTheClasspath.class));
-	}	
-	
-	public void loadClasses(@Observes AfterBeanDiscovery discovery,BeanManager beanManager){
-		CDIRegistry cdiRegistry = new CDIRegistry();
-		cdiRegistry.init(discovery, beanManager);
-
+		discovery.addAnnotatedType(bm.createAnnotatedType(ResourceInTheClasspath.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(XStreamConvertersFactory.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(SerializationsFactory.class));
+		for(Class sterotypeClass : Arrays.asList(BaseComponents.getStereotypeHandlers())){
+			discovery.addAnnotatedType(bm.createAnnotatedType(sterotypeClass));
+		}
+		for (Class<?> cachedComponent : BaseComponents.getCachedComponents().values()) {
+			discovery.addAnnotatedType(bm.createAnnotatedType(cachedComponent));
+		}		
 		for (Entry<Class<?>, Class<?>> entry : BaseComponents
 				.getApplicationScoped().entrySet()) {
 			boolean isProxyInitializer = entry.getValue().equals(
@@ -68,39 +83,53 @@ public class TestExtension implements Extension{
 			boolean isInterceptorHandlerFactorty = entry.getValue().equals(
 					DefaultInterceptorHandlerFactory.class);
 			if (!isProxyInitializer && !isInterceptorHandlerFactorty) {
-				cdiRegistry.register(entry.getKey(), entry.getValue());
+				discovery.addAnnotatedType(bm.createAnnotatedType(entry.getValue()));
 			}
 		}
 		for (Entry<Class<?>, Class<?>> entry : BaseComponents
 				.getRequestScoped().entrySet()) {
 			if (!entry.getValue().equals(JstlLocalization.class)) {
-				cdiRegistry.register(entry.getKey(), entry.getValue());
+				discovery.addAnnotatedType(bm.createAnnotatedType(entry.getValue()));
 			}
 		}
 		for (Entry<Class<?>, Class<?>> entry : BaseComponents
 				.getPrototypeScoped().entrySet()) {
-			cdiRegistry.register(entry.getKey(), entry.getValue());
+			discovery.addAnnotatedType(bm.createAnnotatedType(entry.getValue()));
 		}
-		cdiRegistry.register(ServletContainerFactory.class,ServletContainerFactory.class);
-		cdiRegistry.register(ComponentRegistry.class, CDIRegistry.class);
-		cdiRegistry.register(GenericContainerTest.MyAppComponent.class,GenericContainerTest.MyAppComponent.class);
-		cdiRegistry.register(GenericContainerTest.MyAppComponentWithLifecycle.class,GenericContainerTest.MyAppComponentWithLifecycle.class);
-		cdiRegistry.register(GenericContainerTest.MyRequestComponent.class,GenericContainerTest.MyRequestComponent.class);
-		cdiRegistry.register(GenericContainerTest.MyPrototypeComponent.class,GenericContainerTest.MyPrototypeComponent.class);
-		cdiRegistry.register(GenericContainerTest.DisposableComponent.class,GenericContainerTest.DisposableComponent.class);
-		cdiRegistry.register(GenericContainerTest.StartableComponent.class,GenericContainerTest.StartableComponent.class);
-		cdiRegistry.register(CustomComponentInTheClasspath.class,CustomComponentInTheClasspath.class);
-		cdiRegistry.register(CustomComponentWithLifecycleInTheClasspath.class,CustomComponentWithLifecycleInTheClasspath.class);
-		cdiRegistry.register(Localization.class,MockLocalization.class);
-		cdiRegistry.register(LocalDateConverter.class,LocalDateConverter.class);
-		cdiRegistry.register(LocalTimeConverter.class,LocalTimeConverter.class);
-		cdiRegistry.register(DefaultInterceptorRegistry.class,DefaultInterceptorRegistry.class);
-		cdiRegistry.register(ProxyInitializer.class,NullProxyInitializer.class);
-		cdiRegistry.register(Container.class,CDIBasedContainer.class);
-		cdiRegistry.register(InterceptorHandlerFactory.class,FakeInterceptorHandlerFactory.class);
-		cdiRegistry.register(MySessionComponent.class,MySessionComponent.class);
-		cdiRegistry.register(TheComponentFactory.class,TheComponentFactory.class);
-		cdiRegistry.register(RequestInfo.class,RequestInfo.class);		
-		cdiRegistry.register(DependentOnSomethingFromComponentFactory.class,DependentOnSomethingFromComponentFactory.class);
+		discovery.addAnnotatedType(bm.createAnnotatedType(CDIBasedContainer.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(GenericContainerTest.MyAppComponent.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(GenericContainerTest.MyAppComponentWithLifecycle.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(GenericContainerTest.MyRequestComponent.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(GenericContainerTest.MyPrototypeComponent.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(GenericContainerTest.DisposableComponent.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(GenericContainerTest.StartableComponent.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(InterceptorInTheClasspath.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(ConverterInTheClasspath.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(CustomComponentInTheClasspath.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(CustomComponentWithLifecycleInTheClasspath.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(MockLocalization.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(LocalDateConverter.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(LocalTimeConverter.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(NullProxyInitializer.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(FakeInterceptorHandlerFactory.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(MySessionComponent.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(TheComponentFactory.class));
+		discovery.addAnnotatedType(bm.createAnnotatedType(RequestInfo.class));		
+		discovery.addAnnotatedType(bm.createAnnotatedType(DependentOnSomethingFromComponentFactory.class));
+	}	
+	public void afterDeployment(@Observes AfterDeploymentValidation validation, BeanManager beanManager,Instance<StereotypeHandler> stereotypesHandler){
+		Set<Bean<?>> beans = beanManager.getBeans(Object.class);		
+		for (Bean<?> bean : beans) {
+			for (StereotypeHandler handler : stereotypesHandler) {
+				if (bean.getBeanClass().isAnnotationPresent(handler.stereotype())) {
+					handler.handle(bean.getBeanClass());
+				}
+			}
+		}
 	}
+	
+	public void processAnnotatedType(@Observes ProcessBean<?> pb){
+		
+	}
+
 }

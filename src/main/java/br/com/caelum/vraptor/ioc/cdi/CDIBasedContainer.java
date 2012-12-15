@@ -7,10 +7,12 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
+import br.com.caelum.vraptor.ComponentRegistry;
 import br.com.caelum.vraptor.ioc.AbstractComponentRegistry;
 import br.com.caelum.vraptor.ioc.Container;
 
-public class CDIBasedContainer extends AbstractComponentRegistry implements Container {
+public class CDIBasedContainer implements
+		Container,ComponentRegistry {
 
 	private BeanManager beanManager;
 
@@ -26,11 +28,13 @@ public class CDIBasedContainer extends AbstractComponentRegistry implements Cont
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public <T> T instanceFor(Class<T> type) {
 		Set beans = beanManager.getBeans(type);
-		//TODO tirar esse if daqui... O vraptor deve chamar um canProvide automatico
+		// TODO tirar esse if daqui... O vraptor deve chamar um canProvide
+		// automatico
 		if (canProvide(type)) {
+			//TODO tá com bug aqui... tem objeto registrado 2x, mas como eu pego o próximo estou seguindo.
 			Bean bean = (Bean) beans.iterator().next();
 			CreationalContext ctx = beanManager.createCreationalContext(bean);
-			return (T) beanManager.getReference(bean,type,ctx);
+			return (T) beanManager.getReference(bean, type, ctx);
 		}
 		return null;
 	}
@@ -40,8 +44,14 @@ public class CDIBasedContainer extends AbstractComponentRegistry implements Cont
 	}
 
 	public void register(Class<?> requiredType, Class<?> componentType) {
-		//it is not possible using CDI. We can only registrer on the container startup.
-		System.out.println("Should register "+requiredType+" associated with "+componentType);
+		// it is not possible using CDI. We can only registrer on the container
+		// startup.
+		System.out.println("Should register " + requiredType
+				+ " associated with " + componentType);
+	}
+
+	public void deepRegister(Class<?> componentType) {
+		System.out.println("Should deep register " + componentType);		
 	}
 
 }
