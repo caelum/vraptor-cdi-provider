@@ -7,14 +7,17 @@ import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.inject.Inject;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import br.com.caelum.vraptor.ComponentRegistry;
-import br.com.caelum.vraptor.ioc.AbstractComponentRegistry;
 import br.com.caelum.vraptor.ioc.Container;
 
-public class CDIBasedContainer implements
-		Container,ComponentRegistry {
+public class CDIBasedContainer implements Container, ComponentRegistry {
 
 	private BeanManager beanManager;
+	private static final Logger logger = LoggerFactory
+			.getLogger(CDIBasedContainer.class);
 
 	@Inject
 	public CDIBasedContainer(BeanManager beanManager) {
@@ -28,15 +31,10 @@ public class CDIBasedContainer implements
 	@SuppressWarnings({ "rawtypes", "unchecked" })
 	public <T> T instanceFor(Class<T> type) {
 		Set beans = beanManager.getBeans(type);
-		// TODO tirar esse if daqui... O vraptor deve chamar um canProvide
-		// automatico
-		if (canProvide(type)) {
-			//TODO tá com bug aqui... tem objeto registrado 2x, mas como eu pego o próximo estou seguindo.
-			Bean bean = (Bean) beans.iterator().next();
-			CreationalContext ctx = beanManager.createCreationalContext(bean);
-			return (T) beanManager.getReference(bean, type, ctx);
-		}
-		return null;
+		//TODO use resolve instead of iterator.next()
+		Bean bean = (Bean) beans.iterator().next();
+		CreationalContext ctx = beanManager.createCreationalContext(bean);
+		return (T) beanManager.getReference(bean, type, ctx);
 	}
 
 	public <T> boolean canProvide(Class<T> type) {
@@ -46,12 +44,12 @@ public class CDIBasedContainer implements
 	public void register(Class<?> requiredType, Class<?> componentType) {
 		// it is not possible using CDI. We can only registrer on the container
 		// startup.
-		System.out.println("Should register " + requiredType
-				+ " associated with " + componentType);
+		logger.debug("Should register " + requiredType + " associated with "
+				+ componentType);
 	}
 
 	public void deepRegister(Class<?> componentType) {
-		System.out.println("Should deep register " + componentType);		
+		logger.debug("Should deep register " + componentType);
 	}
 
 }

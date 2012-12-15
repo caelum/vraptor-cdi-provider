@@ -31,6 +31,7 @@ public class CDIProvider implements ContainerProvider {
 	}
 
 	public void start(ServletContext context) {
+		//TODO change here to get the BeanManager from servletContext. If it is not present, try to get from the attribute
 		container = new CDIBasedContainer(beanManager);
 	}
 
