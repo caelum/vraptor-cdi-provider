@@ -60,7 +60,6 @@ public class CDIProviderRegisteringComponentsTest extends
 		Object component = provider.getContainer().instanceFor(CDIComponent.class);
 		System.out.println(component);
 		test.stopContexts();
-		//91355363
 	}
 
 	@AfterClass
