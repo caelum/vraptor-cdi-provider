@@ -34,6 +34,8 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
 
+import static org.mockito.Mockito.when;
+
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
 import static org.hamcrest.Matchers.not;
@@ -54,9 +56,11 @@ public class CDIProviderRegisteringComponentsTest extends
 	public static void main(String[] args) throws Exception {
 		startCDIContainer();		
 		CDIProviderRegisteringComponentsTest test = new CDIProviderRegisteringComponentsTest();
-		test.startContexts();
+		test.setup();
+		test.configureExpectations();
+		test.startContexts();		
 		ContainerProvider provider = test.getProvider();
-		provider.start(test.servletContainerFactory.createServletContext());
+		provider.start(test.context);
 		Object component = provider.getContainer().instanceFor(CDIComponent.class);
 		System.out.println(component);
 		test.stopContexts();
@@ -102,7 +106,7 @@ public class CDIProviderRegisteringComponentsTest extends
 	@Override
 	protected ContainerProvider getProvider() {
 		CDIProvider cdiProvider = new CDIProvider();
-		cdiProvider.setBeanManager(cdiContainer.getBeanManager());
+		cdiProvider.start(context);
 		return cdiProvider;
 	}
 
@@ -232,5 +236,10 @@ public class CDIProviderRegisteringComponentsTest extends
 		assertTrue(bean.getScope().equals(RequestScoped.class));
 	}
 	
+	@Override
+	protected void configureExpectations() {
+		super.configureExpectations();
+		when(context.getAttribute(CDIProvider.BEAN_MANAGER_KEY)).thenReturn(cdiContainer.getBeanManager());
+	}
 
 }

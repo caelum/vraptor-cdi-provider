@@ -11,13 +11,9 @@ import br.com.caelum.vraptor.ioc.spring.VRaptorRequestHolder;
 
 public class CDIProvider implements ContainerProvider {
 
-	private BeanManager beanManager;
+	public static final String BEAN_MANAGER_KEY = "javax.enterprise.inject.spi.BeanManager";
 	private CDIBasedContainer container;
 	
-	public void setBeanManager(BeanManager beanManager) {
-		this.beanManager = beanManager;
-	}
-
 	public <T> T provideForRequest(RequestInfo request, Execution<T> execution) {
 		VRaptorRequestHolder.setRequestForCurrentThread(request);
 		try {
@@ -31,8 +27,11 @@ public class CDIProvider implements ContainerProvider {
 	}
 
 	public void start(ServletContext context) {
-		//TODO change here to get the BeanManager from servletContext. If it is not present, try to get from the attribute
-		container = new CDIBasedContainer(beanManager);
+		BeanManager bm = (BeanManager) context.getAttribute(BEAN_MANAGER_KEY);
+		if(bm==null){
+			throw new IllegalStateException("ServletContext should have the "+BEAN_MANAGER_KEY+" key");
+		}
+		container = new CDIBasedContainer(bm);
 	}
 
 	public Container getContainer() {
