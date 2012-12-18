@@ -18,6 +18,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import br.com.caelum.cdi.component.CDIResourceComponent;
 import br.com.caelum.cdi.component.CDISessionComponent;
 import br.com.caelum.cdi.component.CDIComponent;
 import br.com.caelum.vraptor.core.RequestInfo;
@@ -223,6 +224,13 @@ public class CDIProviderRegisteringComponentsTest extends
 	public void shouldNotAddRequestScopeForComponentWithScope(){
 		Bean<?> bean = cdiContainer.getBeanManager().getBeans(CDISessionComponent.class).iterator().next();
 		assertTrue(bean.getScope().equals(SessionScoped.class));
+	}
+	
+	@Test
+	public void shouldStereotypeResourceWithRequestAndNamed(){
+		Bean<?> bean = cdiContainer.getBeanManager().getBeans(CDIResourceComponent.class).iterator().next();
+		System.out.println(bean.getName());
+		assertTrue(bean.getScope().equals(RequestScoped.class));
 	}
 	
 
