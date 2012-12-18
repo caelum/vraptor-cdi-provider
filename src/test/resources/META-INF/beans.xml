@@ -7,7 +7,7 @@
           http://jboss.org/schema/weld/beans http://jboss.org/schema/weld/beans_1_1.xsd">
           
     <weld:scan>
-        <weld:exclude name="br.com.caelum.vraptor.**" />
+        <weld:exclude name="br.com.caelum.vraptor.**"/>        
     </weld:scan>
 
 </beans>

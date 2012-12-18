@@ -7,9 +7,7 @@ import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
-
-import org.jboss.weld.bootstrap.events.ProcessAnnotatedTypeImpl;
-import org.jboss.weld.manager.BeanManagerImpl;
+import javax.enterprise.inject.spi.ProcessProducer;
 
 import br.com.caelum.vraptor.core.RequestInfo;
 import br.com.caelum.vraptor.ioc.GenericContainerTest;
@@ -25,7 +23,6 @@ import br.com.caelum.vraptor.ioc.fixture.InterceptorInTheClasspath;
 import br.com.caelum.vraptor.ioc.fixture.ResourceInTheClasspath;
 import br.com.caelum.vraptor.ioc.spring.components.DummyComponentFactory;
 
-//TODO tem que tomar cuidado para não registrar o mesmo objeto duas vezes. Infelizmente o beforeBean não permite registrar
 public class TestExtension implements Extension{
 	
 	public void beforeBeanDiscovey(@Observes BeforeBeanDiscovery discovery, BeanManager bm) {

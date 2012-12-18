@@ -7,6 +7,7 @@ import java.util.concurrent.Callable;
 
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.inject.spi.Bean;
 
 import org.apache.deltaspike.cdise.api.CdiContainer;
 import org.apache.deltaspike.cdise.api.CdiContainerLoader;
@@ -17,6 +18,8 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import br.com.caelum.cdi.component.CDISessionComponent;
+import br.com.caelum.cdi.component.CDIComponent;
 import br.com.caelum.vraptor.core.RequestInfo;
 import br.com.caelum.vraptor.ioc.Container;
 import br.com.caelum.vraptor.ioc.ContainerProvider;
@@ -26,7 +29,9 @@ import br.com.caelum.vraptor.ioc.fixture.CustomComponentWithLifecycleInTheClassp
 import br.com.caelum.vraptor.ioc.spring.SpringProviderRegisteringComponentsTest;
 import br.com.caelum.vraptor.ioc.spring.VRaptorRequestHolder;
 
+import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.assertTrue;
 
 import static org.hamcrest.Matchers.equalTo;
 import static org.hamcrest.Matchers.is;
@@ -51,14 +56,10 @@ public class CDIProviderRegisteringComponentsTest extends
 		test.startContexts();
 		ContainerProvider provider = test.getProvider();
 		provider.start(test.servletContainerFactory.createServletContext());
-		MyRequestComponent component = provider.getContainer().instanceFor(MyRequestComponent.class);
-		component.toString();
-		Map<String, Object> req = test.getRequestMap();
-		System.out.println(req.keySet());
-//		System.out.println(cdiContainer.getBeanManager().getBeans(BoundRequestContext.class).iterator().next().getScope());
-//		System.out.println(instance);
+		Object component = provider.getContainer().instanceFor(CDIComponent.class);
+		System.out.println(component);
 		test.stopContexts();
-		//shutdownCDIContainer();
+		//91355363
 	}
 
 	@AfterClass
@@ -134,7 +135,7 @@ public class CDIProviderRegisteringComponentsTest extends
 
 	private Object actualInstance(Object instance) {		
 		try {
-			//Weld proxy is a lazy bitch
+			//sorry, but i have to initialize the weld proxy
 			instance.toString();
 			java.lang.reflect.Field field = instance.getClass()
 					.getDeclaredField("BEAN_INSTANCE_CACHE");
@@ -204,6 +205,25 @@ public class CDIProviderRegisteringComponentsTest extends
 	@Ignore
 	public void setsAnAttributeOnSessionWithTheObjectTypeName() throws Exception {
 	}	
+	
+	@Test
+	public void shouldUseComponentFactoryAsProducer() {
+		ComponentToBeProduced component = getFromContainer(ComponentToBeProduced.class);
+		component.toString();
+		assertNotNull(component);
+	}
+	
+	@Test
+	public void shouldAddRequestScopeForComponentWithoutScope(){
+		Bean<?> bean = cdiContainer.getBeanManager().getBeans(CDIComponent.class).iterator().next();
+		assertTrue(bean.getScope().equals(RequestScoped.class));
+	}
+	
+	@Test
+	public void shouldNotAddRequestScopeForComponentWithScope(){
+		Bean<?> bean = cdiContainer.getBeanManager().getBeans(CDISessionComponent.class).iterator().next();
+		assertTrue(bean.getScope().equals(SessionScoped.class));
+	}
 	
 
 }
