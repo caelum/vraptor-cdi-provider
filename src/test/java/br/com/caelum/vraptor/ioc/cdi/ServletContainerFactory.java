@@ -6,8 +6,6 @@ import java.util.Collections;
 import java.util.Enumeration;
 
 import javax.enterprise.context.ApplicationScoped;
-import javax.enterprise.context.RequestScoped;
-import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Produces;
 import javax.servlet.FilterChain;
@@ -33,31 +31,19 @@ public class ServletContainerFactory {
 
 	private int counter;
 
-	@Produces
-	@SessionScoped
-	@Default
 	public HttpSessionMock getSession() throws Exception {
 		return new HttpSessionMock(createServletContext(), "session" + ++counter);
 	}
 
-	@Produces
-	@RequestScoped
-	@Default
 	public HttpServletRequestMock getRequest() throws Exception {
 		return new HttpServletRequestMock(getSession(), mock(
 				MutableRequest.class, "request" + counter));
 	}
 
-	@Produces
-	@RequestScoped
-	@Default
 	public MutableResponse getResponse() {
 		return mock(MutableResponse.class, "response" + counter);
 	}
 
-	@Produces
-	@RequestScoped
-	@Default
 	public FilterChain getFilterChain() {
 		return mock(FilterChain.class);
 	}	
@@ -79,8 +65,7 @@ public class ServletContainerFactory {
         //allowing(context).getInitParameter(ENCODING);
         //allowing(context).setAttribute(with(any(String.class)), with(any(Object.class)));
             
-        when(context.getInitParameter(SCANNING_PARAM)).thenReturn("enabled");
-
+        when(context.getInitParameter(SCANNING_PARAM)).thenReturn("enabled");        
 		configureExpectations(context);
 		return context;
 	}	

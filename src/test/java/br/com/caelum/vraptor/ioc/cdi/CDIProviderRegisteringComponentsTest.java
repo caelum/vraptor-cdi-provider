@@ -119,11 +119,9 @@ public class CDIProviderRegisteringComponentsTest extends
 				RequestInfo request = new RequestInfo(context, null,
 						servletContainerFactory.getRequest(),
 						servletContainerFactory.getResponse());
-				VRaptorRequestHolder.setRequestForCurrentThread(request);
 
 				T result = execution.execute(request, counter);
 
-				VRaptorRequestHolder.resetRequestForCurrentThread();
 				stop(SessionScoped.class);
 				stop(RequestScoped.class);
 				return result;

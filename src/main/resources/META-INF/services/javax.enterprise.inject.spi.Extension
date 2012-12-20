@@ -1,0 +1,3 @@
+br.com.caelum.vraptor.ioc.cdi.RegisterComponentsExtension
+br.com.caelum.vraptor.ioc.cdi.ComponentExtension
+br.com.caelum.vraptor.ioc.cdi.ComponentFactoryExtension

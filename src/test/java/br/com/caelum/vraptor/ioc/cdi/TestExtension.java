@@ -1,18 +1,14 @@
 package br.com.caelum.vraptor.ioc.cdi;
 
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.Instance;
-import javax.enterprise.inject.spi.AfterDeploymentValidation;
-import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
-import javax.enterprise.inject.spi.Extension;
-import javax.enterprise.inject.spi.ProcessProducer;
+
+import org.junit.Ignore;
 
 import br.com.caelum.vraptor.core.RequestInfo;
 import br.com.caelum.vraptor.ioc.GenericContainerTest;
 import br.com.caelum.vraptor.ioc.MySessionComponent;
-import br.com.caelum.vraptor.ioc.StereotypeHandler;
 import br.com.caelum.vraptor.ioc.TheComponentFactory;
 import br.com.caelum.vraptor.ioc.fixture.ComponentFactoryInTheClasspath;
 import br.com.caelum.vraptor.ioc.fixture.ConverterInTheClasspath;
@@ -23,14 +19,14 @@ import br.com.caelum.vraptor.ioc.fixture.InterceptorInTheClasspath;
 import br.com.caelum.vraptor.ioc.fixture.ResourceInTheClasspath;
 import br.com.caelum.vraptor.ioc.spring.components.DummyComponentFactory;
 
-public class TestExtension implements Extension{
+@Ignore
+public class TestExtension extends RegisterComponentsExtension{
 	
+	@Override
 	public void beforeBeanDiscovey(@Observes BeforeBeanDiscovery discovery, BeanManager bm) {
-		CDIRegistry registry = new CDIRegistry(discovery, bm);
-		registry.configure();
+		super.beforeBeanDiscovey(discovery, bm);
 		//just test objects
-		AnnotatedType<ServletContainerFactory> containerType = bm.createAnnotatedType(ServletContainerFactory.class);
-		discovery.addAnnotatedType(containerType);
+		discovery.addAnnotatedType(bm.createAnnotatedType(ServletContainerFactory.class));
 		discovery.addAnnotatedType(bm.createAnnotatedType(DummyComponentFactory.class));
 		discovery.addAnnotatedType(bm.createAnnotatedType(TheComponentFactory.class));
 		discovery.addAnnotatedType(bm.createAnnotatedType(ComponentFactoryInTheClasspath.class));
@@ -51,8 +47,5 @@ public class TestExtension implements Extension{
 		discovery.addAnnotatedType(bm.createAnnotatedType(RequestInfo.class));		
 		discovery.addAnnotatedType(bm.createAnnotatedType(DependentOnSomethingFromComponentFactory.class));
 	}	
-	public void afterDeployment(@Observes AfterDeploymentValidation validation, BeanManager beanManager,Instance<StereotypeHandler> stereotypesHandler){
-		new StereotypesRegistry(beanManager).configure(stereotypesHandler);
-	}
 
 }

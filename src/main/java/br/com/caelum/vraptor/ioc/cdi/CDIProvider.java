@@ -7,19 +7,20 @@ import br.com.caelum.vraptor.core.Execution;
 import br.com.caelum.vraptor.core.RequestInfo;
 import br.com.caelum.vraptor.ioc.Container;
 import br.com.caelum.vraptor.ioc.ContainerProvider;
-import br.com.caelum.vraptor.ioc.spring.VRaptorRequestHolder;
 
 public class CDIProvider implements ContainerProvider {
 
 	public static final String BEAN_MANAGER_KEY = "javax.enterprise.inject.spi.BeanManager";
 	private CDIBasedContainer container;
+	private BeanManager beanManager;
 	
-	public <T> T provideForRequest(RequestInfo request, Execution<T> execution) {
-		VRaptorRequestHolder.setRequestForCurrentThread(request);
+	public <T> T provideForRequest(RequestInfo request, Execution<T> execution) {		
+		beanManager.fireEvent(request);
 		try {
 			return execution.insideRequest(container);
 		} finally {
-			VRaptorRequestHolder.resetRequestForCurrentThread();
+			//have to clear manually because the requestinfo was not created by CDI container
+			CDIRequestInfoFactory.clearRequestInfo();
 		}
 	}
 
@@ -27,11 +28,11 @@ public class CDIProvider implements ContainerProvider {
 	}
 
 	public void start(ServletContext context) {
-		BeanManager bm = (BeanManager) context.getAttribute(BEAN_MANAGER_KEY);
-		if(bm==null){
+		beanManager = (BeanManager) context.getAttribute(BEAN_MANAGER_KEY);
+		if(beanManager==null){
 			throw new IllegalStateException("ServletContext should have the "+BEAN_MANAGER_KEY+" key");
 		}
-		container = new CDIBasedContainer(bm);
+		container = new CDIBasedContainer(beanManager);
 	}
 
 	public Container getContainer() {

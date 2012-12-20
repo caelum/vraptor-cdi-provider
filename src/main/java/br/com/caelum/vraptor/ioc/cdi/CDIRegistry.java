@@ -30,6 +30,7 @@ public class CDIRegistry {
 		registerCustomProducers();
 		registerConverters();
 		register(CDIBasedContainer.class);
+		register(CDIRequestInfoFactory.class);
 		
 	}
 
