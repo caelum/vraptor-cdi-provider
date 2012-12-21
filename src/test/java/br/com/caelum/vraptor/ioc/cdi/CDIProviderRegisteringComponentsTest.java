@@ -18,9 +18,9 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import br.com.caelum.cdi.component.CDIComponent;
 import br.com.caelum.cdi.component.CDIResourceComponent;
 import br.com.caelum.cdi.component.CDISessionComponent;
-import br.com.caelum.cdi.component.CDIComponent;
 import br.com.caelum.vraptor.core.RequestInfo;
 import br.com.caelum.vraptor.ioc.Container;
 import br.com.caelum.vraptor.ioc.ContainerProvider;
@@ -28,7 +28,6 @@ import br.com.caelum.vraptor.ioc.WhatToDo;
 import br.com.caelum.vraptor.ioc.fixture.ComponentFactoryInTheClasspath;
 import br.com.caelum.vraptor.ioc.fixture.CustomComponentWithLifecycleInTheClasspath;
 import br.com.caelum.vraptor.ioc.spring.SpringProviderRegisteringComponentsTest;
-import br.com.caelum.vraptor.ioc.spring.VRaptorRequestHolder;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -45,7 +44,7 @@ public class CDIProviderRegisteringComponentsTest extends
 
 	private static CdiContainer cdiContainer;
 	private ServletContainerFactory servletContainerFactory = new ServletContainerFactory();
-
+	
 	@BeforeClass
 	public static void startCDIContainer() {
 		cdiContainer = CdiContainerLoader.getCdiContainer();
@@ -105,9 +104,7 @@ public class CDIProviderRegisteringComponentsTest extends
 
 	@Override
 	protected ContainerProvider getProvider() {
-		CDIProvider cdiProvider = new CDIProvider();
-		cdiProvider.start(context);
-		return cdiProvider;
+		return new CDIProvider();
 	}
 
 	@Override
@@ -168,7 +165,7 @@ public class CDIProviderRegisteringComponentsTest extends
 					is(not(equalTo(actualInstance(secondInstance)))));
 		}
 	}
-	
+
 	@Test
 	public void callsPredestroyExactlyOneTime() throws Exception {
 		
@@ -230,7 +227,6 @@ public class CDIProviderRegisteringComponentsTest extends
 	@Test
 	public void shouldStereotypeResourceWithRequestAndNamed(){
 		Bean<?> bean = cdiContainer.getBeanManager().getBeans(CDIResourceComponent.class).iterator().next();
-		System.out.println(bean.getName());
 		assertTrue(bean.getScope().equals(RequestScoped.class));
 	}
 	

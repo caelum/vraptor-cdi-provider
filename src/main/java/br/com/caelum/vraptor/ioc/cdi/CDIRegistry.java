@@ -6,7 +6,10 @@ import java.util.Collection;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 
+import org.apache.deltaspike.core.util.metadata.builder.AnnotatedTypeBuilder;
+
 import br.com.caelum.vraptor.core.BaseComponents;
+import br.com.caelum.vraptor.ioc.ComponentFactory;
 
 public class CDIRegistry {
 
@@ -31,6 +34,7 @@ public class CDIRegistry {
 		registerConverters();
 		register(CDIBasedContainer.class);
 		register(CDIRequestInfoFactory.class);
+		register(ServletContextFactory.class);
 		
 	}
 
@@ -63,7 +67,13 @@ public class CDIRegistry {
 	}
 	
 	private void register(Class<?> component) {
-		discovery.addAnnotatedType(bm.createAnnotatedType(component));		
+		if(ComponentFactory.class.isAssignableFrom(component)){
+			//have to register here because the container does not fire ProcessAnnotatedType for custom components.
+			discovery.addAnnotatedType(new ComponentFactoryAnnotatedTypeCreator().create(component));
+		}
+		else{
+			discovery.addAnnotatedType(bm.createAnnotatedType(component));
+		}
 	}
 
 }

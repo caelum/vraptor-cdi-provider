@@ -1,8 +1,18 @@
 package br.com.caelum.vraptor.ioc.cdi;
 
+import java.util.Set;
+
+import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
+import javax.enterprise.inject.spi.InjectionPoint;
+import javax.enterprise.inject.spi.ProcessAnnotatedType;
+import javax.enterprise.inject.spi.ProcessProducer;
+import javax.enterprise.inject.spi.Producer;
+import javax.servlet.ServletContext;
+import javax.validation.ValidatorFactory;
 
 import org.junit.Ignore;
 
@@ -18,6 +28,8 @@ import br.com.caelum.vraptor.ioc.fixture.DependentOnSomethingFromComponentFactor
 import br.com.caelum.vraptor.ioc.fixture.InterceptorInTheClasspath;
 import br.com.caelum.vraptor.ioc.fixture.ResourceInTheClasspath;
 import br.com.caelum.vraptor.ioc.spring.components.DummyComponentFactory;
+import br.com.caelum.vraptor.validator.ValidatorCreator;
+import br.com.caelum.vraptor.validator.ValidatorFactoryCreator;
 
 @Ignore
 public class TestExtension extends RegisterComponentsExtension{
@@ -26,7 +38,6 @@ public class TestExtension extends RegisterComponentsExtension{
 	public void beforeBeanDiscovey(@Observes BeforeBeanDiscovery discovery, BeanManager bm) {
 		super.beforeBeanDiscovey(discovery, bm);
 		//just test objects
-		discovery.addAnnotatedType(bm.createAnnotatedType(ServletContainerFactory.class));
 		discovery.addAnnotatedType(bm.createAnnotatedType(DummyComponentFactory.class));
 		discovery.addAnnotatedType(bm.createAnnotatedType(TheComponentFactory.class));
 		discovery.addAnnotatedType(bm.createAnnotatedType(ComponentFactoryInTheClasspath.class));
@@ -47,5 +58,27 @@ public class TestExtension extends RegisterComponentsExtension{
 		discovery.addAnnotatedType(bm.createAnnotatedType(RequestInfo.class));		
 		discovery.addAnnotatedType(bm.createAnnotatedType(DependentOnSomethingFromComponentFactory.class));
 	}	
+	
+	public void processProducerForServletContext(@Observes ProcessProducer<ServletContextFactory,ServletContext> producer){
+		final Producer<ServletContext> defaultProducer = producer.getProducer();
+		Producer<ServletContext> testProducer = new Producer<ServletContext>(){
+
+			public ServletContext produce(CreationalContext<ServletContext> ctx) {
+				return new ServletContainerFactory().createServletContext();
+			}
+
+			public void dispose(ServletContext instance) {
+				
+			}
+
+			public Set<InjectionPoint> getInjectionPoints() {
+				return defaultProducer.getInjectionPoints();
+			}
+			
+		};
+
+		producer.setProducer(testProducer);
+	}
+	
 
 }

@@ -51,7 +51,7 @@ public class ServletContainerFactory {
 	
 	@Produces
 	@Default
-	public ServletContext createServletContext() throws Exception {
+	public ServletContext createServletContext() {
 		ServletContext context = mock(ServletContext.class, "servlet context");
 
 		when(context.getMajorVersion()).thenReturn(3);

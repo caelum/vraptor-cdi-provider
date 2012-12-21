@@ -33,6 +33,7 @@ public class CDIProvider implements ContainerProvider {
 			throw new IllegalStateException("ServletContext should have the "+BEAN_MANAGER_KEY+" key");
 		}
 		container = new CDIBasedContainer(beanManager);
+		new StereotypesRegistry(beanManager).configure();
 	}
 
 	public Container getContainer() {
