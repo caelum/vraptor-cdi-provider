@@ -6,7 +6,6 @@ import java.io.PrintStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
 import java.net.MalformedURLException;
-import java.net.URI;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.Map;
@@ -26,10 +25,10 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import br.com.caelum.cdi.component.BeanValidationObjectsFactory;
 import br.com.caelum.cdi.component.CDIComponent;
 import br.com.caelum.cdi.component.CDIResourceComponent;
 import br.com.caelum.cdi.component.CDISessionComponent;
-import br.com.caelum.cdi.component.ValidatorFactoryJavaEECreator;
 import br.com.caelum.vraptor.core.RequestInfo;
 import br.com.caelum.vraptor.ioc.Container;
 import br.com.caelum.vraptor.ioc.ContainerProvider;
@@ -241,7 +240,8 @@ public class CDIProviderRegisteringComponentsTest extends
 	@Test
 	public void shouldNotConfigureJavaEEStuffIfVraptorEEFileIsPresent(){		
 		ValidatorFactory factory = (ValidatorFactory) actualInstance(registerAndGetFromContainer(ValidatorFactory.class,ValidatorFactory.class));
-		assertTrue(factory == ValidatorFactoryJavaEECreator.factory);
+		assertTrue(factory == BeanValidationObjectsFactory.validatorFactory);
+		
 	}
 	
 	@Override
