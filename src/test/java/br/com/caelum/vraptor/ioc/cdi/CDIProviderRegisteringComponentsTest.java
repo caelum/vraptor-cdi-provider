@@ -1,13 +1,20 @@
 package br.com.caelum.vraptor.ioc.cdi;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLClassLoader;
 import java.util.Map;
 import java.util.concurrent.Callable;
 
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.spi.Bean;
+import javax.validation.ValidatorFactory;
 
 import org.apache.deltaspike.cdise.api.CdiContainer;
 import org.apache.deltaspike.cdise.api.CdiContainerLoader;
@@ -18,6 +25,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
+import br.com.caelum.cdi.component.BeanValidationObjectsFactory;
 import br.com.caelum.cdi.component.CDIComponent;
 import br.com.caelum.cdi.component.CDIResourceComponent;
 import br.com.caelum.cdi.component.CDISessionComponent;
@@ -42,31 +50,30 @@ import static org.hamcrest.Matchers.not;
 public class CDIProviderRegisteringComponentsTest extends
 		SpringProviderRegisteringComponentsTest {
 
+	private static final String VRAPTOR_EE_FILE = "src/test/resources/vraptor-cdi-ee.xml";
 	private static CdiContainer cdiContainer;
 	private ServletContainerFactory servletContainerFactory = new ServletContainerFactory();
 	
 	@BeforeClass
-	public static void startCDIContainer() {
+	public static void startCDIContainer(){
+		try {
+			new PrintStream(VRAPTOR_EE_FILE).close();
+			URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{new URL("file://"+VRAPTOR_EE_FILE)});
+			Thread.currentThread().setContextClassLoader(urlClassLoader);
+			
+		} catch (FileNotFoundException e) {
+			throw new RuntimeException(e);
+		} catch (MalformedURLException e) {
+			throw new RuntimeException(e);
+		}
 		cdiContainer = CdiContainerLoader.getCdiContainer();
 		cdiContainer.boot();
 		
 	}
 	
-	public static void main(String[] args) throws Exception {
-		startCDIContainer();		
-		CDIProviderRegisteringComponentsTest test = new CDIProviderRegisteringComponentsTest();
-		test.setup();
-		test.configureExpectations();
-		test.startContexts();		
-		ContainerProvider provider = test.getProvider();
-		provider.start(test.context);
-		Object component = provider.getContainer().instanceFor(CDIComponent.class);
-		System.out.println(component);
-		test.stopContexts();
-	}
-
 	@AfterClass
 	public static void shutdownCDIContainer() {
+		new File(VRAPTOR_EE_FILE).delete();
 		cdiContainer.shutdown();
 	}
 
@@ -228,6 +235,13 @@ public class CDIProviderRegisteringComponentsTest extends
 	public void shouldStereotypeResourceWithRequestAndNamed(){
 		Bean<?> bean = cdiContainer.getBeanManager().getBeans(CDIResourceComponent.class).iterator().next();
 		assertTrue(bean.getScope().equals(RequestScoped.class));
+	}
+	
+	@Test
+	public void shouldNotConfigureJavaEEStuffIfVraptorEEFileIsPresent(){		
+		ValidatorFactory factory = (ValidatorFactory) actualInstance(registerAndGetFromContainer(ValidatorFactory.class,ValidatorFactory.class));
+		assertTrue(factory == BeanValidationObjectsFactory.validatorFactory);
+		
 	}
 	
 	@Override
