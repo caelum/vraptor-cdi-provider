@@ -20,6 +20,11 @@ public class CDIRequestInfoFactory {
 		requests.set(requestInfo);
 	}
 	
+	@Produces
+	public RequestInfo producesRequestInfo(){
+		return requests.get();
+	}
+	
 	@Produces	
 	public MutableRequest producesRequest(){
 		return requests.get().getRequest();

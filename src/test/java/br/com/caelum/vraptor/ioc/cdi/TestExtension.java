@@ -55,7 +55,6 @@ public class TestExtension extends RegisterComponentsExtension{
 		discovery.addAnnotatedType(bm.createAnnotatedType(CustomComponentWithLifecycleInTheClasspath.class));
 		discovery.addAnnotatedType(bm.createAnnotatedType(MySessionComponent.class));
 		discovery.addAnnotatedType(bm.createAnnotatedType(TheComponentFactory.class));
-		discovery.addAnnotatedType(bm.createAnnotatedType(RequestInfo.class));		
 		discovery.addAnnotatedType(bm.createAnnotatedType(DependentOnSomethingFromComponentFactory.class));
 	}	
 	

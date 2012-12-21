@@ -6,18 +6,11 @@ import java.util.Collection;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 
-import org.apache.deltaspike.core.util.metadata.builder.AnnotatedTypeBuilder;
-
 import br.com.caelum.vraptor.core.BaseComponents;
 import br.com.caelum.vraptor.ioc.ComponentFactory;
 
 public class CDIRegistry {
 
-	/*
-	 * should register the RequestInfo factory
-	 * should register the factories
-	 */
-	
 	private BeforeBeanDiscovery discovery;
 	private BeanManager bm;
 
