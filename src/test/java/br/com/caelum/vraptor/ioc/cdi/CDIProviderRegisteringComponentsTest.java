@@ -8,7 +8,9 @@ import java.lang.reflect.Field;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.Callable;
 
 import javax.enterprise.context.RequestScoped;
@@ -29,6 +31,7 @@ import br.com.caelum.cdi.component.BeanValidationObjectsFactory;
 import br.com.caelum.cdi.component.CDIComponent;
 import br.com.caelum.cdi.component.CDIResourceComponent;
 import br.com.caelum.cdi.component.CDISessionComponent;
+import br.com.caelum.vraptor.core.BaseComponents;
 import br.com.caelum.vraptor.core.RequestInfo;
 import br.com.caelum.vraptor.ioc.Container;
 import br.com.caelum.vraptor.ioc.ContainerProvider;
@@ -36,6 +39,9 @@ import br.com.caelum.vraptor.ioc.WhatToDo;
 import br.com.caelum.vraptor.ioc.fixture.ComponentFactoryInTheClasspath;
 import br.com.caelum.vraptor.ioc.fixture.CustomComponentWithLifecycleInTheClasspath;
 import br.com.caelum.vraptor.ioc.spring.SpringProviderRegisteringComponentsTest;
+import br.com.caelum.vraptor.validator.MessageInterpolatorFactory;
+import br.com.caelum.vraptor.validator.ValidatorCreator;
+import br.com.caelum.vraptor.validator.ValidatorFactoryCreator;
 
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
@@ -243,6 +249,15 @@ public class CDIProviderRegisteringComponentsTest extends
 		assertTrue(factory == BeanValidationObjectsFactory.validatorFactory);
 		
 	}
+	
+	@Test
+	public void canProvideAllApplicationScopedComponents() {
+		Set<Class<?>> components = new HashSet<Class<?>>(BaseComponents.getApplicationScoped().keySet());
+		components.remove(ValidatorFactoryCreator.class);
+		components.remove(ValidatorCreator.class);
+		components.remove(MessageInterpolatorFactory.class);
+		checkAvailabilityFor(true, components);
+	}	
 	
 	@Override
 	protected void configureExpectations() {

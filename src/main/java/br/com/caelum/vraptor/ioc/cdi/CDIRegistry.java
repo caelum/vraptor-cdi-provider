@@ -22,6 +22,7 @@ public class CDIRegistry {
 	private BeforeBeanDiscovery discovery;
 	private BeanManager bm;
 	private static final Logger logger = LoggerFactory.getLogger(CDIRegistry.class);
+	private static InputStream vraptorEEFile;
 
 	public CDIRegistry(BeforeBeanDiscovery discovery, BeanManager bm) {
 		this.discovery = discovery;
@@ -71,7 +72,7 @@ public class CDIRegistry {
 	private void register(Class<?> component) {
 		if(ComponentFactory.class.isAssignableFrom(component)){
 			//have to register here because the container does not fire ProcessAnnotatedType for custom components.
-			if(vraptorEEPresent()){
+			if(CDIRegistry.vraptorEEPresent()){
 				Method method = new Mirror().on(component).reflect().method("getInstance").withoutArgs();
 				if(BaseComponents.getJavaEEInterfaces().contains(method.getReturnType().getCanonicalName())){
 					logger.info("Ignoring {}. Let's use the ApplicationServer built in Factory");
@@ -85,11 +86,13 @@ public class CDIRegistry {
 		}
 	}
 	
-	private boolean vraptorEEPresent() {
-    	InputStream xml = BaseComponents.class.getResourceAsStream("/vraptor-cdi-ee.xml");
-    	if(xml!=null){
+	private static boolean vraptorEEPresent() {
+		if(vraptorEEFile==null){
+			vraptorEEFile = BaseComponents.class.getResourceAsStream("/vraptor-cdi-ee.xml");
+		}
+    	if(vraptorEEFile!=null){
     		try {
-				xml.close();
+				vraptorEEFile.close();
 			} catch (IOException e) {
 				logger.error("The vraptor-cdi-ee was not closed");
 			}
