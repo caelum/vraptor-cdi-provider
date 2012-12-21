@@ -7,7 +7,7 @@ import javax.validation.ValidatorFactory;
 
 import org.mockito.Mockito;
 
-public class BeanValidationObjectsFactory {
+public class JavaEEServerBeanValidationObjectsFactory {
 
 	public static final ValidatorFactory validatorFactory = Mockito.mock(ValidatorFactory.class);
 	public static final Validator validator = Mockito.mock(Validator.class);
@@ -21,10 +21,5 @@ public class BeanValidationObjectsFactory {
 	@Produces
 	public Validator producesValidator(){
 		return validator;
-	}
-	
-	@Produces
-	public MessageInterpolator producesMessageInterpolator(){
-		return interpolator;
 	}
 }

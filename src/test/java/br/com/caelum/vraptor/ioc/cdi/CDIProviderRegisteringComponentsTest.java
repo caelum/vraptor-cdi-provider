@@ -27,7 +27,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import br.com.caelum.cdi.component.BeanValidationObjectsFactory;
+import br.com.caelum.cdi.component.JavaEEServerBeanValidationObjectsFactory;
 import br.com.caelum.cdi.component.CDIComponent;
 import br.com.caelum.cdi.component.CDIResourceComponent;
 import br.com.caelum.cdi.component.CDISessionComponent;
@@ -62,16 +62,6 @@ public class CDIProviderRegisteringComponentsTest extends
 	
 	@BeforeClass
 	public static void startCDIContainer(){
-		try {
-			new PrintStream(VRAPTOR_EE_FILE).close();
-			URLClassLoader urlClassLoader = new URLClassLoader(new URL[]{new URL("file://"+VRAPTOR_EE_FILE)});
-			Thread.currentThread().setContextClassLoader(urlClassLoader);
-			
-		} catch (FileNotFoundException e) {
-			throw new RuntimeException(e);
-		} catch (MalformedURLException e) {
-			throw new RuntimeException(e);
-		}
 		cdiContainer = CdiContainerLoader.getCdiContainer();
 		cdiContainer.boot();
 		
@@ -79,7 +69,6 @@ public class CDIProviderRegisteringComponentsTest extends
 	
 	@AfterClass
 	public static void shutdownCDIContainer() {
-		new File(VRAPTOR_EE_FILE).delete();
 		cdiContainer.shutdown();
 	}
 
@@ -246,7 +235,7 @@ public class CDIProviderRegisteringComponentsTest extends
 	@Test
 	public void shouldNotConfigureJavaEEStuffIfVraptorEEFileIsPresent(){		
 		ValidatorFactory factory = (ValidatorFactory) actualInstance(registerAndGetFromContainer(ValidatorFactory.class,ValidatorFactory.class));
-		assertTrue(factory == BeanValidationObjectsFactory.validatorFactory);
+		assertTrue(factory == JavaEEServerBeanValidationObjectsFactory.validatorFactory);
 		
 	}
 	
