@@ -240,6 +240,12 @@ public class CDIProviderRegisteringComponentsTest extends
 	}
 	
 	@Test
+	public void shouldUseConstructorEvenWithoutInject(){
+		CDIResourceComponent resource = registerAndGetFromContainer(CDIResourceComponent.class,CDIResourceComponent.class);
+		assertTrue(resource.isInitializedDepencies());
+	}
+	
+	@Test
 	public void canProvideAllApplicationScopedComponents() {
 		Set<Class<?>> components = new HashSet<Class<?>>(BaseComponents.getApplicationScoped().keySet());
 		components.remove(ValidatorFactoryCreator.class);
