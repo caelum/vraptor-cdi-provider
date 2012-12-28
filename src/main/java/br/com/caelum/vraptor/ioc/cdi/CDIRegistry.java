@@ -14,6 +14,8 @@ import net.vidageek.mirror.dsl.Mirror;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import com.thoughtworks.xstream.XStream;
+
 import br.com.caelum.vraptor.core.BaseComponents;
 import br.com.caelum.vraptor.ioc.ComponentFactory;
 
@@ -22,11 +24,11 @@ public class CDIRegistry {
 	private BeforeBeanDiscovery discovery;
 	private BeanManager bm;
 	private static final Logger logger = LoggerFactory.getLogger(CDIRegistry.class);
-	private static InputStream vraptorEEFile;
+	private static JavaEEConfiguration configuration = CDIRegistry.loadVraptorEEConfiguration();;
 
 	public CDIRegistry(BeforeBeanDiscovery discovery, BeanManager bm) {
 		this.discovery = discovery;
-		this.bm = bm;
+		this.bm = bm;	
 	}
 	
 	public void configure(){
@@ -76,10 +78,10 @@ public class CDIRegistry {
 	private void register(Class<?> component) {
 		if(ComponentFactory.class.isAssignableFrom(component)){
 			//have to register here because the container does not fire ProcessAnnotatedType for custom components.
-			if(CDIRegistry.vraptorEEPresent()){
+			if(CDIRegistry.configuration!=null){
 				Method method = new Mirror().on(component).reflect().method("getInstance").withoutArgs();
-				if(BaseComponents.getJavaEEInterfaces().contains(method.getReturnType().getCanonicalName())){
-					logger.info("Ignoring {}. Let's use the ApplicationServer built in Factory");
+				if(CDIRegistry.configuration.isBeanDisabled((method.getReturnType()))){
+					logger.info("Let's use the Container built in implementation for {}",method.getReturnType());
 					return;
 				}
 			}
@@ -90,19 +92,21 @@ public class CDIRegistry {
 		}
 	}
 	
-	private static boolean vraptorEEPresent() {
-		if(vraptorEEFile==null){
-			vraptorEEFile = BaseComponents.class.getResourceAsStream("/vraptor-cdi-ee.xml");
-		}
-    	if(vraptorEEFile!=null){
+	private static JavaEEConfiguration loadVraptorEEConfiguration() {
+		InputStream vraptorEEFile = BaseComponents.class.getResourceAsStream("/vraptor-cdi-ee.xml");
+		JavaEEConfiguration configuration = null;
+		if(vraptorEEFile!=null){
+			XStream xstream = new XStream();
+			xstream.processAnnotations(JavaEEConfiguration.class);
+			xstream.processAnnotations(BeanClass.class);
+			configuration = (JavaEEConfiguration)xstream.fromXML(vraptorEEFile);
     		try {
 				vraptorEEFile.close();
 			} catch (IOException e) {
 				logger.error("The vraptor-cdi-ee was not closed");
 			}
-    		return true;
-    	}
-		return false;
+		}
+    	return configuration;
 	}	
 
 }

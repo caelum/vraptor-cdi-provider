@@ -1,13 +1,7 @@
 package br.com.caelum.vraptor.ioc.cdi;
 
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintStream;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLClassLoader;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -27,10 +21,10 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 
-import br.com.caelum.cdi.component.JavaEEServerBeanValidationObjectsFactory;
 import br.com.caelum.cdi.component.CDIComponent;
 import br.com.caelum.cdi.component.CDIResourceComponent;
 import br.com.caelum.cdi.component.CDISessionComponent;
+import br.com.caelum.cdi.component.JavaEEServerBeanValidationObjectsFactory;
 import br.com.caelum.vraptor.core.BaseComponents;
 import br.com.caelum.vraptor.core.RequestInfo;
 import br.com.caelum.vraptor.ioc.Container;

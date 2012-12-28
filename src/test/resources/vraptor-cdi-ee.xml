@@ -1,0 +1,10 @@
+<beans>
+    <disable-list>
+        <bean>
+        	<name>javax.validation.Validator</name>
+        </bean>
+        <bean>
+        	<name>javax.validation.ValidatorFactory</name>
+        </bean>        
+    </disable-list>
+</beans>
