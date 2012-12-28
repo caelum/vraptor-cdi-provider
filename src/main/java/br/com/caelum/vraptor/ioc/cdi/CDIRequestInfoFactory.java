@@ -2,6 +2,7 @@ package br.com.caelum.vraptor.ioc.cdi;
 
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Produces;
 import javax.servlet.FilterChain;
 import javax.servlet.ServletContext;
@@ -25,22 +26,30 @@ public class CDIRequestInfoFactory {
 		return requests.get();
 	}
 	
-	@Produces	
+	@Produces
+	@Default
+	@VraptorPreference
 	public MutableRequest producesRequest(){
 		return requests.get().getRequest();
 	}
 	
 	@Produces
+	@Default
+	@VraptorPreference
 	public HttpSession producesSession(){
 		return requests.get().getRequest().getSession();
 	}
 	
 	@Produces
+	@Default
+	@VraptorPreference
 	public MutableResponse producesResponse(){
 		return requests.get().getResponse();
 	}
 	
 	@Produces
+	@VraptorPreference
+	@Default
 	public FilterChain producesFilterChain(){
 		return requests.get().getChain();
 	}	
