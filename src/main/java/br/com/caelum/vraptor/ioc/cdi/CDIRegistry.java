@@ -47,6 +47,10 @@ public class CDIRegistry {
 		register(CDIBasedContainer.class);
 		register(CDIRequestInfoFactory.class);
 		register(ServletContextFactory.class);
+		register(CDIHttpServletRequestFactory.class);
+		register(CDIHttpServletResponseFactory.class);
+		register(CDIFilterChainFactory.class);
+		register(CDIHttpSessionFactory.class);
 		register(ListProducer.class);
 	}
 
