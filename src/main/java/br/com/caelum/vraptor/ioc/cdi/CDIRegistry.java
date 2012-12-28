@@ -16,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import com.thoughtworks.xstream.XStream;
 
+import br.com.caelum.vraptor.VRaptorException;
 import br.com.caelum.vraptor.core.BaseComponents;
 import br.com.caelum.vraptor.ioc.ComponentFactory;
 
@@ -75,20 +76,25 @@ public class CDIRegistry {
 		}
 	}
 	
-	private void register(Class<?> component) {
-		if(ComponentFactory.class.isAssignableFrom(component)){
-			//have to register here because the container does not fire ProcessAnnotatedType for custom components.
-			if(CDIRegistry.configuration!=null){
-				Method method = new Mirror().on(component).reflect().method("getInstance").withoutArgs();
-				if(CDIRegistry.configuration.isBeanDisabled((method.getReturnType()))){
-					logger.info("Let's use the Container built in implementation for {}",method.getReturnType());
-					return;
+	private void register(Class<?> component) {	
+		try{
+			if(ComponentFactory.class.isAssignableFrom(component)){			
+				//have to register here because the container does not fire ProcessAnnotatedType for custom components.
+				if(CDIRegistry.configuration!=null){
+					Method method = component.getMethod("getInstance");
+					if(CDIRegistry.configuration.isBeanDisabled((method.getReturnType()))){
+						logger.info("Let's use the Container built in implementation for {}",method.getReturnType());
+						return;
+					}
 				}
+				discovery.addAnnotatedType(new ComponentFactoryAnnotatedTypeCreator().create(component));
 			}
-			discovery.addAnnotatedType(new ComponentFactoryAnnotatedTypeCreator().create(component));
+			else{
+				discovery.addAnnotatedType(bm.createAnnotatedType(component));
+			}
 		}
-		else{
-			discovery.addAnnotatedType(bm.createAnnotatedType(component));
+		catch(Exception exception){
+			throw new RuntimeException(exception);
 		}
 	}
 	

@@ -5,6 +5,6 @@
         </bean>
         <bean>
         	<name>javax.validation.ValidatorFactory</name>
-        </bean>        
+        </bean>                
     </disable-list>
 </beans>
