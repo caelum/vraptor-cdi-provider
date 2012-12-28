@@ -6,8 +6,10 @@ import javax.enterprise.inject.Default;
 import javax.enterprise.inject.Produces;
 import javax.servlet.ServletContext;
 
+import br.com.caelum.vraptor.ioc.ComponentFactory;
+
 @ApplicationScoped
-public class ServletContextFactory {
+public class ServletContextFactory implements ComponentFactory<ServletContext>{
 
 	private ServletContext context;
 	
@@ -19,7 +21,7 @@ public class ServletContextFactory {
 	@ApplicationScoped
 	@Default
 	@VraptorPreference
-	public ServletContext getContext(){
+	public ServletContext getInstance(){
 		return this.context;
 	}
 }
