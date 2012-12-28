@@ -33,11 +33,9 @@ public class CDIRegistry {
 		registerApplicationComponents();
 		registerRequestComponents();
 		registerPrototypeComponents();	
-		registerCustomProducers();
 		registerConverters();
-		register(CDIBasedContainer.class);
-		register(CDIRequestInfoFactory.class);
-		register(ServletContextFactory.class);
+		registerCDISpecifics();
+
 		
 	}
 
@@ -45,9 +43,11 @@ public class CDIRegistry {
 		registerComponents(BaseComponents.getBundledConverters());
 	}
 
-	private void registerCustomProducers() {
-		register(SerializationsFactory.class);
-		register(XStreamConvertersFactory.class);
+	private void registerCDISpecifics() {
+		register(CDIBasedContainer.class);
+		register(CDIRequestInfoFactory.class);
+		register(ServletContextFactory.class);
+		register(ListProducer.class);
 	}
 
 	private void registerPrototypeComponents() {

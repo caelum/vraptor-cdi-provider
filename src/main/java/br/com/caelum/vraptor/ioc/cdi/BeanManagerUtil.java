@@ -17,14 +17,17 @@ public class BeanManagerUtil {
 	public <T> T instanceFor(Class<T> type) {
 		Set beans = getBeans(type);
 		Bean<T> bean = (Bean<T>) beanManager.resolve(beans);
-		return instanceFor(bean);
+		return instanceFor(bean,type);
 	}
 	
-	public <T> T instanceFor(Bean<?> bean){
-		CreationalContext ctx = beanManager.createCreationalContext(bean);
-		return (T) beanManager.getReference(bean, bean.getBeanClass(), ctx);
-		
+	public <T> T instanceFor(Bean<?> bean){		
+		return instanceFor(bean,bean.getBeanClass());		
 	}
+	
+	public <T> T instanceFor(Bean<?> bean,Class<?> specificType){
+		CreationalContext ctx = beanManager.createCreationalContext(bean);
+		return (T) beanManager.getReference(bean, specificType, ctx);		
+	}	
 	
 	public Set<Bean<?>> getBeans(Class<?> type){
 		return beanManager.getBeans(type);

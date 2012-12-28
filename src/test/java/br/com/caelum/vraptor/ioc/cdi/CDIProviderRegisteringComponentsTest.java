@@ -56,7 +56,6 @@ import static org.hamcrest.Matchers.not;
 public class CDIProviderRegisteringComponentsTest extends
 		SpringProviderRegisteringComponentsTest {
 
-	private static final String VRAPTOR_EE_FILE = "src/test/resources/vraptor-cdi-ee.xml";
 	private static CdiContainer cdiContainer;
 	private ServletContainerFactory servletContainerFactory = new ServletContainerFactory();
 	
