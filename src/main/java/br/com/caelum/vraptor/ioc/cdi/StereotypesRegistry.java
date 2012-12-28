@@ -20,7 +20,7 @@ public class StereotypesRegistry {
 		ArrayList<StereotypeHandler> stereotypesHandler = new ArrayList<StereotypeHandler>();		
 		Set<Bean<?>> stereotypeBeans = beanManagerUtil.getBeans(StereotypeHandler.class);
 		for (Bean<?> bean : stereotypeBeans) {
-			stereotypesHandler.add((StereotypeHandler) beanManagerUtil.instanceFor(bean, bean.getBeanClass()));
+			stereotypesHandler.add((StereotypeHandler) beanManagerUtil.instanceFor(bean));
 		}
 
 		Set<Bean<?>> beans = beanManagerUtil.getBeans(Object.class);		
