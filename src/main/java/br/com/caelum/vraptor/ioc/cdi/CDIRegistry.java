@@ -11,6 +11,7 @@ import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 
 import net.vidageek.mirror.dsl.Mirror;
 
+import org.apache.deltaspike.core.util.metadata.builder.AnnotatedTypeBuilder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -76,6 +77,7 @@ public class CDIRegistry {
 		}
 	}
 	
+	@SuppressWarnings("rawtypes")
 	private void register(Class<?> component) {	
 		try{
 			if(ComponentFactory.class.isAssignableFrom(component)){			
@@ -87,7 +89,8 @@ public class CDIRegistry {
 						return;
 					}
 				}
-				discovery.addAnnotatedType(new ComponentFactoryAnnotatedTypeCreator().create(component));
+				AnnotatedTypeBuilder builder = new ComponentFactoryAnnotatedTypeBuilderCreator().create(component);
+				discovery.addAnnotatedType(builder.create());
 			}
 			else{
 				discovery.addAnnotatedType(bm.createAnnotatedType(component));

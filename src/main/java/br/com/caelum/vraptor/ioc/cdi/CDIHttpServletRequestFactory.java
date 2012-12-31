@@ -1,5 +1,6 @@
 package br.com.caelum.vraptor.ioc.cdi;
 
+import javax.enterprise.inject.Alternative;
 import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
@@ -14,13 +15,14 @@ import br.com.caelum.vraptor.ioc.ComponentFactory;
  *
  */
 @ApplicationScoped
+@Alternative
 public class CDIHttpServletRequestFactory implements ComponentFactory<HttpServletRequest>{
 
 	@Inject
 	private CDIRequestInfoFactory cdiRequestInfoFactory;
 	
 	@Default
-	@VraptorPreference
+	@VraptorPreference	
 	public MutableRequest getInstance(){
 		return cdiRequestInfoFactory.producesRequestInfo().getRequest();
 	}

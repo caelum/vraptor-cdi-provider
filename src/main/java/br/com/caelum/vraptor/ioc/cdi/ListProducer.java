@@ -31,7 +31,7 @@ public class ListProducer {
 
 
 	@Produces
-	public List producesList(InjectionPoint injectionPoint){
+	public <T> List<T> producesList(InjectionPoint injectionPoint){
 		ParameterizedType type = (ParameterizedType) injectionPoint.getType();
 	    Class classe = (Class) type.getActualTypeArguments()[0];
 	    Set<Bean<?>> beans = beanManager.getBeans(classe);
