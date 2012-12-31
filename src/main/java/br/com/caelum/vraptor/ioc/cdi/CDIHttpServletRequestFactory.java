@@ -22,7 +22,7 @@ public class CDIHttpServletRequestFactory implements ComponentFactory<HttpServle
 	private CDIRequestInfoFactory cdiRequestInfoFactory;
 	
 	@Default
-	@VraptorPreference	
+	@VraptorPreference
 	public MutableRequest getInstance(){
 		return cdiRequestInfoFactory.producesRequestInfo().getRequest();
 	}
