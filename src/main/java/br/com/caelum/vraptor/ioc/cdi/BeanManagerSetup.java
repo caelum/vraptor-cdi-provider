@@ -9,14 +9,14 @@ import javax.servlet.ServletContextListener;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 /**
- * 
+ * Listener to register {@link BeanManager} in {@link ServletContext} and fire event
+ * to enable the Producer.
  * @author Alberto Souza and Mario Amaral
  *
  */
 public class BeanManagerSetup implements ServletContextListener {
 	
 	private static final Logger logger = LoggerFactory.getLogger(BeanManagerSetup.class);
-	private static ServletContext context;
 
 	@Inject
 	private BeanManager beanManager;

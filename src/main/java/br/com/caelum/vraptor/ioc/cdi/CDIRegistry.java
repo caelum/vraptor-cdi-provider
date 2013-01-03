@@ -26,7 +26,6 @@ public class CDIRegistry {
 	private BeforeBeanDiscovery discovery;
 	private BeanManager bm;
 	private static final Logger logger = LoggerFactory.getLogger(CDIRegistry.class);
-	private static JavaEEConfiguration configuration = CDIRegistry.loadVraptorEEConfiguration();;
 
 	public CDIRegistry(BeforeBeanDiscovery discovery, BeanManager bm) {
 		this.discovery = discovery;
@@ -81,14 +80,6 @@ public class CDIRegistry {
 	private void register(Class<?> component) {	
 		try{
 			if(ComponentFactory.class.isAssignableFrom(component)){			
-				//have to register here because the container does not fire ProcessAnnotatedType for custom components.
-				if(CDIRegistry.configuration!=null){
-					Method method = component.getMethod("getInstance");
-					if(CDIRegistry.configuration.isBeanDisabled((method.getReturnType()))){
-						logger.info("Let's use the Container built in implementation for {}",method.getReturnType());
-						return;
-					}
-				}
 				AnnotatedTypeBuilder builder = new ComponentFactoryAnnotatedTypeBuilderCreator().create(component);
 				discovery.addAnnotatedType(builder.create());
 			}
@@ -101,21 +92,4 @@ public class CDIRegistry {
 		}
 	}
 	
-	private static JavaEEConfiguration loadVraptorEEConfiguration() {
-		InputStream vraptorEEFile = BaseComponents.class.getResourceAsStream("/vraptor-cdi-ee.xml");
-		JavaEEConfiguration configuration = null;
-		if(vraptorEEFile!=null){
-			XStream xstream = new XStream();
-			xstream.processAnnotations(JavaEEConfiguration.class);
-			xstream.processAnnotations(BeanClass.class);
-			configuration = (JavaEEConfiguration)xstream.fromXML(vraptorEEFile);
-    		try {
-				vraptorEEFile.close();
-			} catch (IOException e) {
-				logger.error("The vraptor-cdi-ee was not closed");
-			}
-		}
-    	return configuration;
-	}	
-
 }
