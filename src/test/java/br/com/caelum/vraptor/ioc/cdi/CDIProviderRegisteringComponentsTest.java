@@ -1,15 +1,26 @@
 package br.com.caelum.vraptor.ioc.cdi;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Callable;
 
+import javassist.CannotCompileException;
+import javassist.ClassPool;
+import javassist.CtClass;
+import javassist.CtConstructor;
+import javassist.CtNewConstructor;
+import javassist.NotFoundException;
+
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
 import javax.enterprise.inject.spi.Bean;
+import javax.servlet.ServletContext;
 import javax.validation.ValidatorFactory;
 
 import org.apache.deltaspike.cdise.api.CdiContainer;
@@ -27,8 +38,11 @@ import br.com.caelum.cdi.component.CDISessionComponent;
 import br.com.caelum.cdi.component.JavaEEServerBeanValidationObjectsFactory;
 import br.com.caelum.vraptor.core.BaseComponents;
 import br.com.caelum.vraptor.core.RequestInfo;
+import br.com.caelum.vraptor.http.route.Router;
+import br.com.caelum.vraptor.http.route.RoutesParser;
 import br.com.caelum.vraptor.ioc.Container;
 import br.com.caelum.vraptor.ioc.ContainerProvider;
+import br.com.caelum.vraptor.ioc.ResourceHandler;
 import br.com.caelum.vraptor.ioc.WhatToDo;
 import br.com.caelum.vraptor.ioc.fixture.ComponentFactoryInTheClasspath;
 import br.com.caelum.vraptor.ioc.fixture.CustomComponentWithLifecycleInTheClasspath;
@@ -246,7 +260,7 @@ public class CDIProviderRegisteringComponentsTest extends
 		components.remove(MessageInterpolatorFactory.class);
 		checkAvailabilityFor(true, components);
 	}	
-	
+		
 	@Override
 	protected void configureExpectations() {
 		super.configureExpectations();

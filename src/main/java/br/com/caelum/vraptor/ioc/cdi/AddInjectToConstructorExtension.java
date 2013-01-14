@@ -45,14 +45,14 @@ public class AddInjectToConstructorExtension implements Extension{
 	private void tryToDefineInjectConstructor(ProcessAnnotatedType pat,
 			AnnotatedTypeBuilder builder) {
 		Class componentClass = pat.getAnnotatedType().getJavaClass();
-		List<Constructor> constructors = new Mirror().on(componentClass).reflectAll().constructorsMatching(new NoArgsAndNoInjectConstructorMatcher());
+		List<Constructor> constructors = new Mirror().on(componentClass).reflectAll().constructorsMatching(new ArgsAndNoInjectConstructorMatcher());
 		if(!constructors.isEmpty()){
 			Constructor constructor = constructors.get(0);
 			builder.addToConstructor(constructor, new AnnotationLiteral<Inject>() {});			
 		}
 	}	
 	
-	private static class NoArgsAndNoInjectConstructorMatcher implements Matcher<Constructor>{
+	private static class ArgsAndNoInjectConstructorMatcher implements Matcher<Constructor>{
 
 		public boolean accepts(Constructor constructor) {
 			boolean hasInject = constructor.isAnnotationPresent(Inject.class);

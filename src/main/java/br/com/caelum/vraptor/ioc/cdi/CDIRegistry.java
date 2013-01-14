@@ -26,6 +26,7 @@ public class CDIRegistry {
 	private BeforeBeanDiscovery discovery;
 	private BeanManager bm;
 	private static final Logger logger = LoggerFactory.getLogger(CDIRegistry.class);
+	private ConstructorAdapter constructorAdapter = new ConstructorAdapter();
 
 	public CDIRegistry(BeforeBeanDiscovery discovery, BeanManager bm) {
 		this.discovery = discovery;
@@ -78,13 +79,14 @@ public class CDIRegistry {
 	
 	@SuppressWarnings("rawtypes")
 	private void register(Class<?> component) {	
+		Class modifiedClass = constructorAdapter.tryToAddCDIConstructorFor(component);
 		try{
 			if(ComponentFactory.class.isAssignableFrom(component)){			
-				AnnotatedTypeBuilder builder = new ComponentFactoryAnnotatedTypeBuilderCreator().create(component);
+				AnnotatedTypeBuilder builder = new ComponentFactoryAnnotatedTypeBuilderCreator().create(modifiedClass);
 				discovery.addAnnotatedType(builder.create());
 			}
 			else{
-				discovery.addAnnotatedType(bm.createAnnotatedType(component));
+				discovery.addAnnotatedType(bm.createAnnotatedType(modifiedClass));
 			}
 		}
 		catch(Exception exception){
