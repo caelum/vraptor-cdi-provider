@@ -1,23 +1,13 @@
 package br.com.caelum.vraptor.ioc.cdi;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.lang.reflect.Method;
 import java.util.Arrays;
 import java.util.Collection;
 
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 
-import net.vidageek.mirror.dsl.Mirror;
-
 import org.apache.deltaspike.core.util.metadata.builder.AnnotatedTypeBuilder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import com.thoughtworks.xstream.XStream;
-
-import br.com.caelum.vraptor.VRaptorException;
 import br.com.caelum.vraptor.core.BaseComponents;
 import br.com.caelum.vraptor.ioc.ComponentFactory;
 
@@ -25,8 +15,6 @@ public class CDIRegistry {
 
 	private BeforeBeanDiscovery discovery;
 	private BeanManager bm;
-	private static final Logger logger = LoggerFactory.getLogger(CDIRegistry.class);
-	private ConstructorAdapter constructorAdapter = new ConstructorAdapter();
 
 	public CDIRegistry(BeforeBeanDiscovery discovery, BeanManager bm) {
 		this.discovery = discovery;
@@ -78,15 +66,14 @@ public class CDIRegistry {
 	}
 	
 	@SuppressWarnings("rawtypes")
-	private void register(Class<?> component) {	
-		Class modifiedClass = constructorAdapter.tryToAddCDIConstructorFor(component);
+	private void register(Class<?> component) {			
 		try{
 			if(ComponentFactory.class.isAssignableFrom(component)){			
-				AnnotatedTypeBuilder builder = new ComponentFactoryAnnotatedTypeBuilderCreator().create(modifiedClass);
+				AnnotatedTypeBuilder builder = new ComponentFactoryAnnotatedTypeBuilderCreator().create(component);
 				discovery.addAnnotatedType(builder.create());
 			}
 			else{
-				discovery.addAnnotatedType(bm.createAnnotatedType(modifiedClass));
+				discovery.addAnnotatedType(bm.createAnnotatedType(component));
 			}
 		}
 		catch(Exception exception){
