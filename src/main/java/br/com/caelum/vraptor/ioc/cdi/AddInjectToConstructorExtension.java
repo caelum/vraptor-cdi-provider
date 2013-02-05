@@ -25,20 +25,16 @@ public class AddInjectToConstructorExtension implements Extension{
 
 	public void processAnnotatedType(@Observes final ProcessAnnotatedType pat) {
 		HashSet<Class<? extends Annotation>> stereotypes = Sets.newHashSet(BaseComponents.getStereotypes());
-		boolean hasStereotype = false;
-		defaultStereotypesFor:for (Class<? extends Annotation> stereotype : stereotypes) {
+		for (Class<? extends Annotation> stereotype : stereotypes) {
 			for(Annotation foundAnnotation : pat.getAnnotatedType().getAnnotations()){
 				if(foundAnnotation.annotationType().equals(stereotype)){
-					hasStereotype = true;
-					break defaultStereotypesFor;
+					AnnotatedTypeBuilder builder = new AnnotatedTypeBuilder();
+					builder.readFromType(pat.getAnnotatedType());
+					tryToDefineInjectConstructor(pat, builder);
+					pat.setAnnotatedType(builder.create());
+					return ;
 				}
 			}
-		}
-		if(hasStereotype){
-			AnnotatedTypeBuilder builder = new AnnotatedTypeBuilder();
-			builder.readFromType(pat.getAnnotatedType());
-			tryToDefineInjectConstructor(pat, builder);
-			pat.setAnnotatedType(builder.create());
 		}
 	}
 	
@@ -46,7 +42,8 @@ public class AddInjectToConstructorExtension implements Extension{
 			AnnotatedTypeBuilder builder) {
 		Class componentClass = pat.getAnnotatedType().getJavaClass();
 		List<Constructor> constructors = new Mirror().on(componentClass).reflectAll().constructorsMatching(new ArgsAndNoInjectConstructorMatcher());
-		if(!constructors.isEmpty()){
+		boolean hasArgsConstructorAndNoInjection = !constructors.isEmpty();
+		if(hasArgsConstructorAndNoInjection){
 			Constructor constructor = constructors.get(0);
 			builder.addToConstructor(constructor, new AnnotationLiteral<Inject>() {});			
 		}
