@@ -11,19 +11,15 @@ import br.com.caelum.vraptor.ioc.Container;
 
 public class CDIBasedContainer implements Container, ComponentRegistry {
 
-	private BeanManager beanManager;
+	private final BeanManager beanManager;
 	private static final Logger logger = LoggerFactory
 			.getLogger(CDIBasedContainer.class);
-	private BeanManagerUtil beanManagerUtil;
+	private final BeanManagerUtil beanManagerUtil;
 
 	@Inject
 	public CDIBasedContainer(BeanManager beanManager) {
 		this.beanManager = beanManager;
 		this.beanManagerUtil = new BeanManagerUtil(beanManager);
-	}
-
-	@Deprecated
-	protected CDIBasedContainer() {
 	}
 
 	public <T> T instanceFor(Class<T> type) {

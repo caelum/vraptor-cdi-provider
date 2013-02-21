@@ -15,8 +15,8 @@ import br.com.caelum.vraptor.ioc.cdi.BeanManagerUtil;
 
 public class ListProducer {
 	
-	private BeanManager beanManager;
-	private BeanManagerUtil beanManagerUtil;
+	private final BeanManager beanManager;
+	private final BeanManagerUtil beanManagerUtil;
 	
 	@Inject
 	public ListProducer(BeanManager beanManager) {
@@ -24,17 +24,12 @@ public class ListProducer {
 		beanManagerUtil = new BeanManagerUtil(beanManager);
 	}
 
-	@Deprecated
-	public ListProducer() {
-	}
-
-
-
+	@SuppressWarnings({ "rawtypes", "unchecked" })
 	@Produces
 	public <T> List<T> producesList(InjectionPoint injectionPoint){
 		ParameterizedType type = (ParameterizedType) injectionPoint.getType();
-	    Class classe = (Class) type.getActualTypeArguments()[0];
-	    Set<Bean<?>> beans = beanManager.getBeans(classe);
+	    Class klass = (Class) type.getActualTypeArguments()[0];
+	    Set<Bean<?>> beans = beanManager.getBeans(klass);
 	    ArrayList objects = new ArrayList();
 	    for (Bean<?> bean : beans) {			
 			objects.add(beanManagerUtil.instanceFor(bean));

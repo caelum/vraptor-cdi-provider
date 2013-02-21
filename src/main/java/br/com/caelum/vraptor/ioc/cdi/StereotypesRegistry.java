@@ -10,7 +10,7 @@ import br.com.caelum.vraptor.ioc.StereotypeHandler;
 
 public class StereotypesRegistry {
 
-	private BeanManagerUtil beanManagerUtil;
+	private final BeanManagerUtil beanManagerUtil;
 
 	public StereotypesRegistry(BeanManager bm) {
 		beanManagerUtil = new BeanManagerUtil(bm);
