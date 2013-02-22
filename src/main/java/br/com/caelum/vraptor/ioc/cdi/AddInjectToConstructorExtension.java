@@ -20,6 +20,7 @@ import br.com.caelum.vraptor.core.BaseComponents;
 
 import com.google.common.collect.Sets;
 
+//TODO unit tests
 @SuppressWarnings({ "rawtypes","unchecked","serial" })
 public class AddInjectToConstructorExtension implements Extension{
 
