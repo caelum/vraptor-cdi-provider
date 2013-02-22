@@ -2,8 +2,11 @@ package br.com.caelum.vraptor.ioc.cdi;
 
 import java.lang.annotation.Annotation;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 
 import javax.enterprise.context.Dependent;
 import javax.enterprise.context.NormalScope;
@@ -23,42 +26,60 @@ import br.com.caelum.vraptor.ioc.SessionScoped;
 @SuppressWarnings({ "unchecked", "rawtypes" })
 public class ScopesUtil {
 
-	private List cdiScopes = Arrays.asList(
+	private final List cdiScopes = Arrays.asList(
 			javax.enterprise.context.ApplicationScoped.class,
 			javax.enterprise.context.SessionScoped.class, Dependent.class,
 			RequestScoped.class);
 
-	private List vraptorScopes = Arrays.asList(ApplicationScoped.class,
+	private final List vraptorScopes = Arrays.asList(ApplicationScoped.class,
 			SessionScoped.class, br.com.caelum.vraptor.ioc.RequestScoped.class,
 			PrototypeScoped.class);
 
-	private HashSet<Annotation> findAnnotations(final Class<?> componentType,
-			final List annotationTypes) {
+	private final Map<Class<? extends Annotation>, Class<? extends Annotation>> cdiToVraptorScopes = 
+			new HashMap<Class<? extends Annotation>, Class<? extends Annotation>>();
+	
+	{
+		cdiToVraptorScopes.put(javax.enterprise.context.ApplicationScoped.class,ApplicationScoped.class);
+		cdiToVraptorScopes.put(javax.enterprise.context.SessionScoped.class,SessionScoped.class);
+		cdiToVraptorScopes.put(RequestScoped.class,br.com.caelum.vraptor.ioc.RequestScoped.class);
+		cdiToVraptorScopes.put(javax.enterprise.context.Dependent.class,PrototypeScoped.class);
+	}
+
+	private HashSet<Class<? extends Annotation>> findAnnotations(final Class<?> componentType,
+			final List scopesAnnotation) {
 		Annotation[] annotations = componentType.getAnnotations();
-		HashSet<Annotation> result = new HashSet<Annotation>();
-		for (Annotation annotation : annotations) {
-			for (Class findedAnnotation : (List<Class>) annotationTypes) {
-				if (annotation.annotationType().equals(findedAnnotation)) {
-					result.add(annotation);
+		HashSet<Class<? extends Annotation>> result = new HashSet<Class<? extends Annotation>>();
+		for (Annotation componentAnnotation : annotations) {
+			for (Class scopeAnnotation : (List<Class>) scopesAnnotation) {
+				if (componentAnnotation.annotationType().equals(scopeAnnotation)) {
+					result.add(componentAnnotation.annotationType());
 				}
 			}
 		}
 		return result;
 	}
 
-	private HashSet<Annotation> cdiScopes(final Class<?> componentType) {
+	private HashSet<Class<? extends Annotation>> cdiScopes(final Class<?> componentType) {
 		return findAnnotations(componentType, cdiScopes);
 	}
 
-	public boolean isScoped(Class<?> clazz) {
-		return !cdiScopes(clazz).isEmpty() || !vraptorScopes(clazz).isEmpty();
-	}
-	
-	public boolean isScope(Class<? extends Annotation> annotation){
-		return cdiScopes.contains(annotation) || vraptorScopes.contains(annotation);
+	public ScopeInfo isScoped(Class<?> clazz) {
+		ScopeInfo scopedInfo = new ScopeInfo();
+		Iterator iterator = cdiScopes(clazz).iterator();
+		if(iterator.hasNext()){
+			Class<? extends Annotation> cdiScope = (Class<? extends Annotation>) iterator.next();
+			scopedInfo.setScope(cdiToVraptorScopes.get(cdiScope));
+			return scopedInfo;
+		}
+		iterator = vraptorScopes(clazz).iterator();
+		if(iterator.hasNext()){
+			Class<? extends Annotation> vraptorScope = (Class<? extends Annotation>) iterator.next();
+			scopedInfo.setScope(vraptorScope);			
+		}
+		return scopedInfo;
 	}
 
-	private HashSet<Annotation> vraptorScopes(final Class<?> componentType) {
+	private HashSet<Class<? extends Annotation>> vraptorScopes(final Class<?> componentType) {
 		return findAnnotations(componentType, vraptorScopes);
 	}
 

@@ -1,6 +1,7 @@
 package br.com.caelum.vraptor.ioc.cdi;
 
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.Default;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.ProcessAnnotatedType;
@@ -13,7 +14,7 @@ import br.com.caelum.vraptor.ioc.RequestScoped;
 
 public class ComponentExtension implements Extension {
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
+	@SuppressWarnings({ "rawtypes", "unchecked", "serial" })
 	public void processAnnotatedType(@Observes final ProcessAnnotatedType pat) {		
 		final AnnotatedType defaultType = pat.getAnnotatedType();
 		if (pat.getAnnotatedType().getJavaClass()
@@ -21,9 +22,11 @@ public class ComponentExtension implements Extension {
 			AnnotatedTypeBuilder builder = new AnnotatedTypeBuilder();
 			builder.readFromType(defaultType);
 			ScopesUtil registry = new ScopesUtil();
-			if(!registry.isScoped(pat.getAnnotatedType().getJavaClass())){
-				builder.addToClass(new AnnotationLiteral<RequestScoped>() {});
+			ScopeInfo scopeInfoFromTheClass = registry.isScoped(pat.getAnnotatedType().getJavaClass());
+			if(!scopeInfoFromTheClass.hasScope()){
+				builder.addToClass(new ScopeInfo(RequestScoped.class).getLiteral());				
 			}
+			builder.addToClass(new AnnotationLiteral<Default>() {});
 			pat.setAnnotatedType(builder.create());
 		}
 	}
