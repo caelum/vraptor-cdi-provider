@@ -19,7 +19,9 @@ import javassist.NotFoundException;
 
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
+import javax.enterprise.inject.Default;
 import javax.enterprise.inject.spi.Bean;
+import javax.enterprise.util.AnnotationLiteral;
 import javax.servlet.ServletContext;
 import javax.validation.ValidatorFactory;
 
@@ -65,7 +67,7 @@ public class CDIProviderRegisteringComponentsTest extends
 		SpringProviderRegisteringComponentsTest {
 
 	private static CdiContainer cdiContainer;
-	private ServletContainerFactory servletContainerFactory = new ServletContainerFactory();
+	private final ServletContainerFactory servletContainerFactory = new ServletContainerFactory();
 	
 	@BeforeClass
 	public static void startCDIContainer(){
@@ -144,7 +146,7 @@ public class CDIProviderRegisteringComponentsTest extends
 	private Object actualInstance(Object instance) {		
 		try {
 			//sorry, but i have to initialize the weld proxy
-			instance.toString();
+			initializeProxy(instance);
 			java.lang.reflect.Field field = instance.getClass()
 					.getDeclaredField("BEAN_INSTANCE_CACHE");
 			field.setAccessible(true);
@@ -155,6 +157,7 @@ public class CDIProviderRegisteringComponentsTest extends
 		}
 	}
 	
+	@Override
 	protected <T> T instanceFor(final Class<T> component,
 			Container container) {
 		T maybeAWeldProxy = container.instanceFor(component);
@@ -175,6 +178,7 @@ public class CDIProviderRegisteringComponentsTest extends
 		}
 	}
 
+	@Override
 	@Test
 	public void callsPredestroyExactlyOneTime() throws Exception {
 		
@@ -187,6 +191,7 @@ public class CDIProviderRegisteringComponentsTest extends
 		
 	}
 	
+	@Override
 	@Test
 	public void shoudCallPredestroyExactlyOneTimeForComponentsScannedFromTheClasspath() {
 		CustomComponentWithLifecycleInTheClasspath component = getFromContainer(CustomComponentWithLifecycleInTheClasspath.class);
@@ -196,6 +201,7 @@ public class CDIProviderRegisteringComponentsTest extends
 		startCDIContainer();
 	}
 
+	@Override
 	@Test
 	public void shoudCallPredestroyExactlyOneTimeForComponentFactoriesScannedFromTheClasspath() {
 		ComponentFactoryInTheClasspath componentFactory = getFromContainer(ComponentFactoryInTheClasspath.class);
@@ -206,10 +212,12 @@ public class CDIProviderRegisteringComponentsTest extends
 		startCDIContainer();
 	}
 	
+	@Override
 	@Ignore
 	public void setsAnAttributeOnRequestWithTheObjectTypeName() throws Exception {
 	}
 	
+	@Override
 	@Ignore
 	public void setsAnAttributeOnSessionWithTheObjectTypeName() throws Exception {
 	}	
@@ -217,26 +225,33 @@ public class CDIProviderRegisteringComponentsTest extends
 	@Test
 	public void shouldUseComponentFactoryAsProducer() {
 		ComponentToBeProduced component = getFromContainer(ComponentToBeProduced.class);
-		component.toString();
+		initializeProxy(component);
 		assertNotNull(component);
+	}
+
+	private void initializeProxy(Object component) {
+		component.toString();
 	}
 	
 	@Test
-	public void shouldAddRequestScopeForComponentWithoutScope(){
+	public void shouldAddRequestScopeAndDefaultQualifierForComponentWithoutScope(){
 		Bean<?> bean = cdiContainer.getBeanManager().getBeans(CDIComponent.class).iterator().next();
 		assertTrue(bean.getScope().equals(RequestScoped.class));
+		assertTrue(bean.getQualifiers().contains(new AnnotationLiteral<Default>() {}));
 	}
 	
 	@Test
 	public void shouldNotAddRequestScopeForComponentWithScope(){
 		Bean<?> bean = cdiContainer.getBeanManager().getBeans(CDISessionComponent.class).iterator().next();
 		assertTrue(bean.getScope().equals(SessionScoped.class));
+		assertTrue(bean.getQualifiers().contains(new AnnotationLiteral<Default>() {}));
 	}
 	
 	@Test
 	public void shouldStereotypeResourceWithRequestAndNamed(){
 		Bean<?> bean = cdiContainer.getBeanManager().getBeans(CDIResourceComponent.class).iterator().next();
 		assertTrue(bean.getScope().equals(RequestScoped.class));
+		assertTrue(bean.getQualifiers().contains(new AnnotationLiteral<Default>() {}));
 	}
 	
 	@Test
@@ -252,6 +267,7 @@ public class CDIProviderRegisteringComponentsTest extends
 		assertTrue(resource.isInitializedDepencies());
 	}
 	
+	@Override
 	@Test
 	public void canProvideAllApplicationScopedComponents() {
 		Set<Class<?>> components = new HashSet<Class<?>>(BaseComponents.getApplicationScoped().keySet());

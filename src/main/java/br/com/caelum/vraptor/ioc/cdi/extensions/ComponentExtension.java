@@ -14,7 +14,6 @@ import br.com.caelum.vraptor.ioc.RequestScoped;
 import br.com.caelum.vraptor.ioc.cdi.ScopeInfo;
 import br.com.caelum.vraptor.ioc.cdi.ScopesUtil;
 
-//TOOD unit tests
 public class ComponentExtension implements Extension {
 	
 	@SuppressWarnings({ "rawtypes", "unchecked", "serial" })

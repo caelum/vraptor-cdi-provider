@@ -13,7 +13,6 @@ import org.apache.deltaspike.core.util.metadata.builder.AnnotatedTypeBuilder;
 import br.com.caelum.vraptor.ioc.ComponentFactory;
 import br.com.caelum.vraptor.ioc.cdi.ComponentFactoryAnnotatedTypeBuilderCreator;
 
-//TODO unit tests
 public class ComponentFactoryExtension implements Extension{
 	
 	private final Set<Class<?>> analyzed = new HashSet<Class<?>>();

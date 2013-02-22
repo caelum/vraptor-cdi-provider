@@ -1,6 +1,7 @@
 package br.com.caelum.vraptor.ioc.cdi;
 
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,9 +44,10 @@ public class ComponentFactoryAnnotatedTypeBuilderCreator {
 		try{
 			AnnotatedTypeBuilder builder = new AnnotatedTypeBuilder();
 			builder.readFromType(klass);
-			builder.addToMethod(klass.getMethod("getInstance"),new AnnotationLiteral<Produces>() {});
-			builder.addToMethod(klass.getMethod("getInstance"),vraptorToCDIScopes.get(scopeInfo.getScope()));			
-			builder.addToMethod(klass.getMethod("getInstance"),new AnnotationLiteral<Default>() {});			
+			Method getInstance = klass.getMethod("getInstance");
+			builder.addToMethod(getInstance,new AnnotationLiteral<Produces>() {});
+			builder.addToMethod(getInstance,vraptorToCDIScopes.get(scopeInfo.getScope()));			
+			builder.addToMethod(getInstance,new AnnotationLiteral<Default>() {});
 			return builder;
 		}
 		catch(Exception exception){

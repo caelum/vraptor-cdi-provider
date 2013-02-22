@@ -11,6 +11,7 @@ import br.com.caelum.vraptor.ioc.PrototypeScoped;
 import br.com.caelum.vraptor.ioc.RequestScoped;
 import br.com.caelum.vraptor.ioc.SessionScoped;
 
+//TODO unit tests
 @SuppressWarnings("serial")
 public class ScopeInfo {
 
