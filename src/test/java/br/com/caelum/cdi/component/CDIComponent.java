@@ -12,7 +12,6 @@ public class CDIComponent implements ComponentFactory {
 
 	private final MyRequestComponent component;
 	
-	@Inject
 	public CDIComponent(MyRequestComponent component) {
 		this.component = component;
 	}
