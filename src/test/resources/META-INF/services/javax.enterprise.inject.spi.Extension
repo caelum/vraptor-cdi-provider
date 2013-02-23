@@ -1,4 +1,4 @@
 br.com.caelum.vraptor.ioc.cdi.TestExtension
-br.com.caelum.vraptor.ioc.cdi.ComponentExtension
-br.com.caelum.vraptor.ioc.cdi.ComponentFactoryExtension
-br.com.caelum.vraptor.ioc.cdi.AddInjectToConstructorExtension
+br.com.caelum.vraptor.ioc.cdi.extensions.ComponentExtension
+br.com.caelum.vraptor.ioc.cdi.extensions.ComponentFactoryExtension
+br.com.caelum.vraptor.ioc.cdi.extensions.AddInjectToConstructorExtension

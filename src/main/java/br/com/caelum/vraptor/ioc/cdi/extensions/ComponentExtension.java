@@ -24,7 +24,7 @@ public class ComponentExtension implements Extension {
 			AnnotatedTypeBuilder builder = new AnnotatedTypeBuilder();
 			builder.readFromType(defaultType);
 			ScopesUtil registry = new ScopesUtil();
-			ScopeInfo scopeInfoFromTheClass = registry.isScoped(pat.getAnnotatedType().getJavaClass());
+			ScopeInfo scopeInfoFromTheClass = registry.isScoped(defaultType.getJavaClass());
 			if(!scopeInfoFromTheClass.hasScope()){
 				builder.addToClass(new ScopeInfo(RequestScoped.class).getLiteral());				
 			}
