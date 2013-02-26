@@ -220,24 +220,21 @@ public class CDIProviderRegisteringComponentsTest extends
 	}
 	
 	@Test
-	public void shouldAddRequestScopeAndDefaultQualifierForComponentWithoutScope(){
+	public void shouldAddRequestScopeForComponentWithoutScope(){
 		Bean<?> bean = cdiContainer.getBeanManager().getBeans(CDIComponent.class).iterator().next();
 		assertEquals(RequestScoped.class,bean.getScope());
-		assertTrue(bean.getQualifiers().contains(new AnnotationLiteral<Default>() {}));
 	}
 	
 	@Test
 	public void shouldNotAddRequestScopeForComponentWithScope(){
 		Bean<?> bean = cdiContainer.getBeanManager().getBeans(CDISessionComponent.class).iterator().next();
 		assertTrue(bean.getScope().equals(SessionScoped.class));
-		assertTrue(bean.getQualifiers().contains(new AnnotationLiteral<Default>() {}));
 	}
 	
 	@Test
 	public void shouldStereotypeResourceWithRequestAndNamed(){
 		Bean<?> bean = cdiContainer.getBeanManager().getBeans(CDIResourceComponent.class).iterator().next();
 		assertTrue(bean.getScope().equals(RequestScoped.class));
-		assertTrue(bean.getQualifiers().contains(new AnnotationLiteral<Default>() {}));
 	}
 	
 	@Test
