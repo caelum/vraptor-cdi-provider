@@ -39,6 +39,7 @@ import br.com.caelum.vraptor.validator.MessageInterpolatorFactory;
 import br.com.caelum.vraptor.validator.ValidatorCreator;
 import br.com.caelum.vraptor.validator.ValidatorFactoryCreator;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.assertTrue;
@@ -107,6 +108,7 @@ public class CDIProviderRegisteringComponentsTest extends
 	@Override
 	protected <T> T executeInsideRequest(final WhatToDo<T> execution) {
 		Callable<T> task = new Callable<T>() {
+			@Override
 			public T call() throws Exception {
 				start(RequestScoped.class);
 				start(SessionScoped.class);				
@@ -222,7 +224,7 @@ public class CDIProviderRegisteringComponentsTest extends
 	@Test
 	public void shouldAddRequestScopeAndDefaultQualifierForComponentWithoutScope(){
 		Bean<?> bean = cdiContainer.getBeanManager().getBeans(CDIComponent.class).iterator().next();
-		assertTrue(bean.getScope().equals(RequestScoped.class));
+		assertEquals(RequestScoped.class,bean.getScope());
 		assertTrue(bean.getQualifiers().contains(new AnnotationLiteral<Default>() {}));
 	}
 	
