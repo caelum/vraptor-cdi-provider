@@ -22,7 +22,6 @@ public class ComponentExtensionTest {
 		ComponentExtension extension = new ComponentExtension();
 		extension.processAnnotatedType(pat);
 		assertTrue(pat.getAnnotatedType().getAnnotations().contains(new AnnotationLiteral<RequestScoped>() {}));
-		assertTrue(pat.getAnnotatedType().getAnnotations().contains(new AnnotationLiteral<Default>() {}));
 	}
 	
 	@Test
@@ -32,7 +31,6 @@ public class ComponentExtensionTest {
 		extension.processAnnotatedType(pat);
 		assertFalse(pat.getAnnotatedType().getAnnotations().contains(new AnnotationLiteral<RequestScoped>() {}));
 		assertTrue(pat.getAnnotatedType().getAnnotations().contains(new AnnotationLiteral<SessionScoped>() {}));
-		assertTrue(pat.getAnnotatedType().getAnnotations().contains(new AnnotationLiteral<Default>() {}));
 	}
 	
 	@Test

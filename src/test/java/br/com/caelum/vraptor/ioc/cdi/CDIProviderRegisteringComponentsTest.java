@@ -200,12 +200,10 @@ public class CDIProviderRegisteringComponentsTest extends
 		startCDIContainer();
 	}
 	
-	@Override
 	@Ignore
 	public void setsAnAttributeOnRequestWithTheObjectTypeName() throws Exception {
 	}
 	
-	@Override
 	@Ignore
 	public void setsAnAttributeOnSessionWithTheObjectTypeName() throws Exception {
 	}	

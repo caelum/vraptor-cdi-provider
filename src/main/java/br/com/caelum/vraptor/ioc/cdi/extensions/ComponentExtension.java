@@ -23,12 +23,11 @@ public class ComponentExtension implements Extension {
 				.isAnnotationPresent(Component.class)) {
 			AnnotatedTypeBuilder builder = new AnnotatedTypeBuilder();
 			builder.readFromType(defaultType);
-			ScopesUtil registry = new ScopesUtil();
+			ScopesUtil registry = new ScopesUtil();			
 			ScopeInfo scopeInfoFromTheClass = registry.isScoped(defaultType.getJavaClass());
 			if(!scopeInfoFromTheClass.hasScope()){
 				builder.addToClass(new ScopeInfo(RequestScoped.class).getLiteral());				
 			}
-			builder.addToClass(new AnnotationLiteral<Default>() {});
 			pat.setAnnotatedType(builder.create());
 		}
 	}

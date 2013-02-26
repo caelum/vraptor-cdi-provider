@@ -47,7 +47,6 @@ public class ComponentFactoryAnnotatedTypeBuilderCreator {
 			Method getInstance = klass.getMethod("getInstance");
 			builder.addToMethod(getInstance,new AnnotationLiteral<Produces>() {});
 			builder.addToMethod(getInstance,vraptorToCDIScopes.get(scopeInfo.getScope()));			
-			builder.addToMethod(getInstance,new AnnotationLiteral<Default>() {});
 			return builder;
 		}
 		catch(Exception exception){

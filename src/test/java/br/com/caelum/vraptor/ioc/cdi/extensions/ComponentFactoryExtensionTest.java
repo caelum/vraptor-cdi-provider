@@ -28,7 +28,6 @@ public class ComponentFactoryExtensionTest {
 		AnnotatedMethod producer = getProducer(pat.getAnnotatedType());
 		assertTrue(producer.isAnnotationPresent(Produces.class));
 		assertTrue(producer.isAnnotationPresent(RequestScoped.class));
-		assertTrue(producer.isAnnotationPresent(Default.class));
 	}
 	
 	@Test
@@ -39,7 +38,6 @@ public class ComponentFactoryExtensionTest {
 		AnnotatedMethod producer = getProducer(pat.getAnnotatedType());
 		assertTrue(producer.isAnnotationPresent(Produces.class));
 		assertTrue(producer.isAnnotationPresent(ApplicationScoped.class));
-		assertTrue(producer.isAnnotationPresent(Default.class));
 	}
 	
 	private AnnotatedMethod getProducer(AnnotatedType annotatedType){
