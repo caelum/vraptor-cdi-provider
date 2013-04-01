@@ -38,6 +38,7 @@ import br.com.caelum.vraptor.ioc.spring.SpringProviderRegisteringComponentsTest;
 import br.com.caelum.vraptor.validator.MessageInterpolatorFactory;
 import br.com.caelum.vraptor.validator.ValidatorCreator;
 import br.com.caelum.vraptor.validator.ValidatorFactoryCreator;
+import br.com.caelum.vraptor.view.PathResolver;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -235,6 +236,12 @@ public class CDIProviderRegisteringComponentsTest extends
 	public void shouldStereotypeResourceWithRequestAndNamed(){
 		Bean<?> bean = cdiContainer.getBeanManager().getBeans(CDIResourceComponent.class).iterator().next();
 		assertTrue(bean.getScope().equals(RequestScoped.class));
+	}
+	
+	@Test
+	public void shouldUseCustomComponent(){
+		PathResolver resolver = getFromContainer(PathResolver.class);
+		assertEquals("/vraptor/route",resolver.pathFor(null));
 	}
 	
 	@Test

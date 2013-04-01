@@ -5,8 +5,6 @@ import br.com.caelum.vraptor.ioc.ComponentFactory;
 import br.com.caelum.vraptor.ioc.GenericContainerTest.MyRequestComponent;
 import br.com.caelum.vraptor.ioc.cdi.ComponentToBeProduced;
 
-import com.google.inject.Inject;
-
 @Component
 public class CDIComponent implements ComponentFactory {
 
