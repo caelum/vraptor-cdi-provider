@@ -6,6 +6,7 @@ import java.util.Set;
 import javax.enterprise.inject.spi.AnnotatedConstructor;
 import javax.inject.Inject;
 
+import org.apache.deltaspike.core.util.metadata.builder.AnnotatedTypeBuilder;
 import org.junit.Test;
 
 import br.com.caelum.vraptor.ioc.Component;
@@ -13,13 +14,16 @@ import br.com.caelum.vraptor.ioc.Component;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
+@SuppressWarnings({"rawtypes","unchecked"})
 public class AddInjectToConstructorExtensionTest {
 
 	@Test
 	public void shouldAddInjectToConstructorWithArgs(){
 		ProcessAnnotatedTypeMock pat = ProcessAnnotatedTypeFactory.create(WithArgsConstructor.class);
-		AddInjectToConstructorExtension extension = new AddInjectToConstructorExtension();
+		AnnotatedTypeBuilder builder = new AnnotatedTypeBuilder().readFromType(pat.getAnnotatedType());
+		AddInjectToConstructorExtension extension = new AddInjectToConstructorExtension(builder);
 		extension.processAnnotatedType(pat);
+		pat.setAnnotatedType(builder.create());
 		AnnotatedConstructor<?> argsConstructor = withArgs(pat.getAnnotatedType().getConstructors());
 		AnnotatedConstructor<?> withoutArgsConstructor = withoutArgs(pat.getAnnotatedType().getConstructors());
 		assertTrue(argsConstructor.isAnnotationPresent(Inject.class));
@@ -30,8 +34,10 @@ public class AddInjectToConstructorExtensionTest {
 	@Test
 	public void shouldNotAddInjectToConstructorWithoutArgs(){
 		ProcessAnnotatedTypeMock pat = ProcessAnnotatedTypeFactory.create(WithNonArgsConstructor.class);
-		AddInjectToConstructorExtension extension = new AddInjectToConstructorExtension();
+		AnnotatedTypeBuilder builder = new AnnotatedTypeBuilder().readFromType(pat.getAnnotatedType());
+		AddInjectToConstructorExtension extension = new AddInjectToConstructorExtension(builder);
 		extension.processAnnotatedType(pat);
+		pat.setAnnotatedType(builder.create());
 		AnnotatedConstructor<?> withoutArgsConstructor = withoutArgs(pat.getAnnotatedType().getConstructors());
 		assertFalse(withoutArgsConstructor.isAnnotationPresent(Inject.class));
 	}

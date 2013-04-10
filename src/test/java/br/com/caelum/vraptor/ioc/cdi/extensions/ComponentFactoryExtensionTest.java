@@ -11,6 +11,7 @@ import javax.enterprise.inject.spi.AnnotatedMethod;
 import javax.enterprise.inject.spi.AnnotatedType;
 import javax.enterprise.util.AnnotationLiteral;
 
+import org.apache.deltaspike.core.util.metadata.builder.AnnotatedTypeBuilder;
 import org.junit.Test;
 
 import static org.junit.Assert.assertTrue;
@@ -23,8 +24,10 @@ public class ComponentFactoryExtensionTest {
 	@Test
 	public void shouldAddRequestScopeAndDefaultToProducerMethod() throws InterruptedException{
 		ProcessAnnotatedTypeMock pat = ProcessAnnotatedTypeFactory.create(NonScopedFactory.class);
-		ComponentFactoryExtension extension = new ComponentFactoryExtension();
+		AnnotatedTypeBuilder builder = new AnnotatedTypeBuilder().readFromType(pat.getAnnotatedType());
+		ComponentFactoryExtension extension = new ComponentFactoryExtension(builder);
 		extension.addProducesToComponentFactory(pat);
+		pat.setAnnotatedType(builder.create());
 		AnnotatedMethod producer = getProducer(pat.getAnnotatedType());
 		assertTrue(producer.isAnnotationPresent(Produces.class));
 		assertTrue(producer.isAnnotationPresent(RequestScoped.class));
@@ -33,8 +36,10 @@ public class ComponentFactoryExtensionTest {
 	@Test
 	public void shouldAddClassScopeAndDefaultToProducerMethod(){
 		ProcessAnnotatedTypeMock pat = ProcessAnnotatedTypeFactory.create(ScopedFactory.class);
-		ComponentFactoryExtension extension = new ComponentFactoryExtension();
+		AnnotatedTypeBuilder builder = new AnnotatedTypeBuilder().readFromType(pat.getAnnotatedType());
+		ComponentFactoryExtension extension = new ComponentFactoryExtension(builder);
 		extension.addProducesToComponentFactory(pat);
+		pat.setAnnotatedType(builder.create());
 		AnnotatedMethod producer = getProducer(pat.getAnnotatedType());
 		assertTrue(producer.isAnnotationPresent(Produces.class));
 		assertTrue(producer.isAnnotationPresent(ApplicationScoped.class));
