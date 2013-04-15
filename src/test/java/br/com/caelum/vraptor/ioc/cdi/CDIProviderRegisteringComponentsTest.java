@@ -27,6 +27,7 @@ import br.com.caelum.cdi.component.CDIComponent;
 import br.com.caelum.cdi.component.CDIResourceComponent;
 import br.com.caelum.cdi.component.CDISessionComponent;
 import br.com.caelum.cdi.component.JavaEEServerBeanValidationObjectsFactory;
+import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.core.BaseComponents;
 import br.com.caelum.vraptor.core.RequestInfo;
 import br.com.caelum.vraptor.ioc.Container;
@@ -38,6 +39,7 @@ import br.com.caelum.vraptor.ioc.spring.SpringProviderRegisteringComponentsTest;
 import br.com.caelum.vraptor.validator.MessageInterpolatorFactory;
 import br.com.caelum.vraptor.validator.ValidatorCreator;
 import br.com.caelum.vraptor.validator.ValidatorFactoryCreator;
+import br.com.caelum.vraptor.view.PageResult;
 import br.com.caelum.vraptor.view.PathResolver;
 
 import static org.junit.Assert.assertEquals;
@@ -118,7 +120,7 @@ public class CDIProviderRegisteringComponentsTest extends
 						servletContainerFactory.getResponse());
 
 				T result = execution.execute(request, counter);
-
+				
 				stop(SessionScoped.class);
 				stop(RequestScoped.class);
 				return result;
@@ -240,8 +242,14 @@ public class CDIProviderRegisteringComponentsTest extends
 	
 	@Test
 	public void shouldUseCustomComponent(){
-		PathResolver resolver = getFromContainer(PathResolver.class);
-		assertEquals("/vraptor/route",resolver.pathFor(null));
+		Code<PathResolver> code = new Code<PathResolver>() {
+
+			@Override
+			public void execute(PathResolver bean) {
+				assertEquals("/vraptor/route",bean.pathFor(null));				
+			}
+		};
+		getFromContainerAndExecuteSomeCode(PathResolver.class, code);
 	}
 	
 	@Test
@@ -255,7 +263,7 @@ public class CDIProviderRegisteringComponentsTest extends
 	public void shouldUseConstructorEvenWithoutInject(){
 		CDIResourceComponent resource = registerAndGetFromContainer(CDIResourceComponent.class,CDIResourceComponent.class);
 		assertTrue(resource.isInitializedDepencies());
-	}
+	}	
 	
 	@Override
 	@Test
