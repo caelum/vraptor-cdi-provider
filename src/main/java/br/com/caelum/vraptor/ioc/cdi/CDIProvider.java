@@ -16,12 +16,7 @@ public class CDIProvider implements ContainerProvider {
 	
 	public <T> T provideForRequest(RequestInfo request, Execution<T> execution) {		
 		beanManager.fireEvent(request);
-		try {
-			return execution.insideRequest(container);
-		} finally {
-			//have to clear manually because the requestinfo was not created by CDI container
-			CDIRequestInfoFactory.clearRequestInfo();
-		}
+		return execution.insideRequest(container);
 	}
 
 	public void stop() {

@@ -1,27 +1,23 @@
 package br.com.caelum.vraptor.ioc.cdi;
 
-import javax.enterprise.context.ApplicationScoped;
+import javax.enterprise.context.RequestScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Produces;
 
 import br.com.caelum.vraptor.core.RequestInfo;
 
-@ApplicationScoped
+@RequestScoped
 public class CDIRequestInfoFactory {
-
-	private static ThreadLocal<RequestInfo> requests = new ThreadLocal<RequestInfo>();
 	
+	private RequestInfo requestInfo;
+
 	public void observesRequest(@Observes RequestInfo requestInfo){
-		requests.set(requestInfo);
+		this.requestInfo = requestInfo;
 	}
 	
 	@Produces
 	public RequestInfo producesRequestInfo(){
-		return requests.get();
+		return requestInfo;
 	}		
-		
-	public static void clearRequestInfo(){
-		requests.set(null);
-	}
 	
 }

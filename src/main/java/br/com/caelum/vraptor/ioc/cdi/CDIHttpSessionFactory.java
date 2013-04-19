@@ -5,18 +5,16 @@ import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 
-import br.com.caelum.vraptor.ioc.ApplicationScoped;
 import br.com.caelum.vraptor.ioc.ComponentFactory;
+import br.com.caelum.vraptor.ioc.RequestScoped;
 
-@ApplicationScoped
+@RequestScoped
 @Alternative
 public class CDIHttpSessionFactory implements ComponentFactory<HttpSession>{
 	
 	@Inject
 	private CDIRequestInfoFactory cdiRequestInfoFactory;	
 
-	@Default
-	@VraptorPreference
 	public HttpSession getInstance(){
 		return cdiRequestInfoFactory.producesRequestInfo().getRequest().getSession();
 	}
