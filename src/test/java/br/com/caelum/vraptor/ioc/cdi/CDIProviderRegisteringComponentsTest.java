@@ -9,10 +9,7 @@ import java.util.concurrent.Callable;
 
 import javax.enterprise.context.RequestScoped;
 import javax.enterprise.context.SessionScoped;
-import javax.enterprise.inject.Default;
 import javax.enterprise.inject.spi.Bean;
-import javax.enterprise.util.AnnotationLiteral;
-import javax.validation.ValidatorFactory;
 
 import org.apache.deltaspike.cdise.api.CdiContainer;
 import org.apache.deltaspike.cdise.api.CdiContainerLoader;
@@ -26,8 +23,6 @@ import org.junit.Test;
 import br.com.caelum.cdi.component.CDIComponent;
 import br.com.caelum.cdi.component.CDIResourceComponent;
 import br.com.caelum.cdi.component.CDISessionComponent;
-import br.com.caelum.cdi.component.JavaEEServerBeanValidationObjectsFactory;
-import br.com.caelum.vraptor.Result;
 import br.com.caelum.vraptor.core.BaseComponents;
 import br.com.caelum.vraptor.core.RequestInfo;
 import br.com.caelum.vraptor.ioc.Container;
@@ -39,7 +34,6 @@ import br.com.caelum.vraptor.ioc.spring.SpringProviderRegisteringComponentsTest;
 import br.com.caelum.vraptor.validator.MessageInterpolatorFactory;
 import br.com.caelum.vraptor.validator.ValidatorCreator;
 import br.com.caelum.vraptor.validator.ValidatorFactoryCreator;
-import br.com.caelum.vraptor.view.PageResult;
 import br.com.caelum.vraptor.view.PathResolver;
 
 import static org.junit.Assert.assertEquals;
@@ -250,13 +244,6 @@ public class CDIProviderRegisteringComponentsTest extends
 			}
 		};
 		getFromContainerAndExecuteSomeCode(PathResolver.class, code);
-	}
-	
-	@Test
-	public void shouldNotConfigureJavaEEStuffIfVraptorEEFileIsPresent(){		
-		ValidatorFactory factory = (ValidatorFactory) actualInstance(registerAndGetFromContainer(ValidatorFactory.class,ValidatorFactory.class));
-		assertTrue(factory == JavaEEServerBeanValidationObjectsFactory.validatorFactory);
-		
 	}
 	
 	@Test
