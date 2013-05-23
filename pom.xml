@@ -9,8 +9,15 @@
 	<dependencies>		
 	  <dependency>
 	    <groupId>br.com.caelum</groupId>
-			<artifactId>vraptor</artifactId>
-			<version>3.5.2-SNAPSHOT</version>
+		<artifactId>vraptor</artifactId>
+		<version>3.5.2-SNAPSHOT</version>
+	  </dependency>	  
+	  <dependency>
+	    <groupId>br.com.caelum</groupId>
+		<artifactId>vraptor</artifactId>
+		<version>3.5.2-SNAPSHOT</version>
+		<scope>test</scope>
+		<classifier>tests</classifier>		    
 	  </dependency>	  
 		<!-- [cdi] -->		
 		<dependency>
@@ -121,7 +128,7 @@
 			<artifactId>joda-time</artifactId>
 			<version>1.6</version>
 			<scope>test</scope>
-		</dependency>	    	
+		</dependency>	    		    	
 	</dependencies>
 	
 	<build>
