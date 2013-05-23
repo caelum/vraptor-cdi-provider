@@ -25,6 +25,9 @@ public class BeanManagerUtil {
 	}
 	
 	public <T> T instanceFor(Bean<?> bean,Class<?> specificType){
+		if(bean==null){
+			throw new IllegalArgumentException("Bean must not be null. Class "+specificType);
+		}
 		CreationalContext ctx = beanManager.createCreationalContext(bean);
 		return (T) beanManager.getReference(bean, specificType, ctx);		
 	}	

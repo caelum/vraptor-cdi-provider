@@ -2,6 +2,8 @@ package br.com.caelum.vraptor.ioc.cdi;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Field;
+import java.util.Collections;
+import java.util.Enumeration;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
@@ -263,7 +265,9 @@ public class CDIProviderRegisteringComponentsTest extends
 		
 	@Override
 	protected void configureExpectations() {
-		super.configureExpectations();
+	    	Enumeration<String> emptyEnumeration = Collections.enumeration(Collections.<String>emptyList());
+	    	when(context.getInitParameterNames()).thenReturn(emptyEnumeration);
+	    	when(context.getAttributeNames()).thenReturn(emptyEnumeration);
 		when(context.getAttribute(CDIProvider.BEAN_MANAGER_KEY)).thenReturn(cdiContainer.getBeanManager());
 	}
 

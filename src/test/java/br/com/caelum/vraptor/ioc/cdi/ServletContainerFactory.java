@@ -71,8 +71,8 @@ public class ServletContainerFactory {
 	}	
 
     private void configureExpectations(ServletContext context) {
-		when(context.getRealPath(anyString()))
-			.thenReturn(SpringBasedContainer.class.getResource("../fixture").getFile());
+//		when(context.getRealPath(anyString()))
+//			.thenReturn(SpringBasedContainer.class.getResource("../fixture").getFile());
 
     	Enumeration<String> emptyEnumeration = Collections.enumeration(Collections.<String>emptyList());
     	when(context.getInitParameterNames()).thenReturn(emptyEnumeration);
