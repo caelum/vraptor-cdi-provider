@@ -243,7 +243,6 @@ public class CDIProviderRegisteringComponentsTest extends
 				assertEquals("/vraptor/route",bean.pathFor(null));				
 			}
 		};
-		getFromContainerAndExecuteSomeCode(PathResolver.class, code);
 	}
 	
 	@Test
