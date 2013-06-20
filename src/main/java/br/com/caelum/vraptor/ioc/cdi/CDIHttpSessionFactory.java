@@ -1,7 +1,7 @@
 package br.com.caelum.vraptor.ioc.cdi;
 
+import javax.annotation.Priority;
 import javax.enterprise.inject.Alternative;
-import javax.enterprise.inject.Default;
 import javax.inject.Inject;
 import javax.servlet.http.HttpSession;
 
@@ -10,6 +10,7 @@ import br.com.caelum.vraptor.ioc.RequestScoped;
 
 @RequestScoped
 @Alternative
+@Priority(1000)
 public class CDIHttpSessionFactory implements ComponentFactory<HttpSession>{
 	
 	@Inject

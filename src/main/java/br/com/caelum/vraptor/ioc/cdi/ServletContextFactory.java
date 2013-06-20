@@ -1,5 +1,6 @@
 package br.com.caelum.vraptor.ioc.cdi;
 
+import javax.annotation.Priority;
 import javax.enterprise.context.ApplicationScoped;
 import javax.enterprise.event.Observes;
 import javax.enterprise.inject.Alternative;
@@ -9,6 +10,7 @@ import br.com.caelum.vraptor.ioc.ComponentFactory;
 
 @ApplicationScoped
 @Alternative
+@Priority(1000)
 public class ServletContextFactory implements ComponentFactory<ServletContext>{
 
 	private ServletContext context;
