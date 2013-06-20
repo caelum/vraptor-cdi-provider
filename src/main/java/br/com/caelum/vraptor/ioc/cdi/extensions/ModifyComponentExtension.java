@@ -11,15 +11,22 @@ public class ModifyComponentExtension implements Extension {
 
 	@SuppressWarnings("unchecked")
 	public void processAnnotatedType(@Observes final ProcessAnnotatedType pat) {
-		AnnotatedTypeBuilder builder = new AnnotatedTypeBuilder();
-		builder.readFromType(pat.getAnnotatedType());
-		AddInjectToConstructorExtension addInjectToConstructorExtension = new AddInjectToConstructorExtension(builder);
-		ComponentExtension componentExtension = new ComponentExtension(builder);
-		ComponentFactoryExtension componentFactoryExtension = new ComponentFactoryExtension(builder);
-		addInjectToConstructorExtension.processAnnotatedType(pat);
-		componentExtension.processAnnotatedType(pat);
-		componentFactoryExtension.addProducesToComponentFactory(pat);
-		pat.setAnnotatedType(builder.create());
+		if(accept(pat)){
+			AnnotatedTypeBuilder builder = new AnnotatedTypeBuilder();		
+			builder.readFromType(pat.getAnnotatedType());
+			AddInjectToConstructorExtension addInjectToConstructorExtension = new AddInjectToConstructorExtension(builder);
+			ComponentExtension componentExtension = new ComponentExtension(builder);
+			ComponentFactoryExtension componentFactoryExtension = new ComponentFactoryExtension(builder);
+			addInjectToConstructorExtension.processAnnotatedType(pat);
+			componentExtension.processAnnotatedType(pat);
+			componentFactoryExtension.addProducesToComponentFactory(pat);
+			pat.setAnnotatedType(builder.create());
+		}
+	}
+
+	private boolean accept(ProcessAnnotatedType pat) {
+		Class type = pat.getAnnotatedType().getJavaClass();
+		return !type.isEnum() && !type.isInterface() && !type.isAnnotation();
 	}
 
 }

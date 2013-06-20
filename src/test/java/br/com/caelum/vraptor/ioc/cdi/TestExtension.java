@@ -4,23 +4,19 @@ import java.util.Set;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
-import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
+import javax.enterprise.inject.spi.Extension;
 import javax.enterprise.inject.spi.InjectionPoint;
-import javax.enterprise.inject.spi.ProcessAnnotatedType;
 import javax.enterprise.inject.spi.ProcessProducer;
 import javax.enterprise.inject.spi.Producer;
 import javax.servlet.ServletContext;
-import javax.validation.ValidatorFactory;
 
 import org.junit.Ignore;
 
-import br.com.caelum.vraptor.core.RequestInfo;
 import br.com.caelum.vraptor.ioc.GenericContainerTest;
 import br.com.caelum.vraptor.ioc.MySessionComponent;
 import br.com.caelum.vraptor.ioc.TheComponentFactory;
-import br.com.caelum.vraptor.ioc.cdi.extensions.RegisterComponentsExtension;
 import br.com.caelum.vraptor.ioc.fixture.ComponentFactoryInTheClasspath;
 import br.com.caelum.vraptor.ioc.fixture.ConverterInTheClasspath;
 import br.com.caelum.vraptor.ioc.fixture.CustomComponentInTheClasspath;
@@ -29,15 +25,11 @@ import br.com.caelum.vraptor.ioc.fixture.DependentOnSomethingFromComponentFactor
 import br.com.caelum.vraptor.ioc.fixture.InterceptorInTheClasspath;
 import br.com.caelum.vraptor.ioc.fixture.ResourceInTheClasspath;
 import br.com.caelum.vraptor.ioc.spring.components.DummyComponentFactory;
-import br.com.caelum.vraptor.validator.ValidatorCreator;
-import br.com.caelum.vraptor.validator.ValidatorFactoryCreator;
 
 @Ignore
-public class TestExtension extends RegisterComponentsExtension{
+public class TestExtension implements Extension{
 	
-	@Override
 	public void beforeBeanDiscovey(@Observes BeforeBeanDiscovery discovery, BeanManager bm) {
-		super.beforeBeanDiscovey(discovery, bm);
 		//just test objects
 		discovery.addAnnotatedType(bm.createAnnotatedType(DummyComponentFactory.class));
 		discovery.addAnnotatedType(bm.createAnnotatedType(TheComponentFactory.class));
