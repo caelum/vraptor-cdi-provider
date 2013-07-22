@@ -56,7 +56,7 @@ public class CDIProviderRegisteringComponentsTest extends
 	private final ServletContainerFactory servletContainerFactory = new ServletContainerFactory();
 	
 	@BeforeClass
-	public static void startCDIContainer(){
+	public static void startCDIContainer() {
 		cdiContainer = CdiContainerLoader.getCdiContainer();
 		cdiContainer.boot();
 		
@@ -172,9 +172,9 @@ public class CDIProviderRegisteringComponentsTest extends
 		MyAppComponentWithLifecycle component = registerAndGetFromContainer(MyAppComponentWithLifecycle.class,
 				MyAppComponentWithLifecycle.class);		
 		assertThat(component.getCalls(), is(0));
-		shutdownCDIContainer();
-		assertThat(component.getCalls(), is(1));
+		shutdownCDIContainer();		
 		startCDIContainer();
+		assertThat(component.getCalls(), is(1));
 		
 	}
 	
@@ -184,8 +184,8 @@ public class CDIProviderRegisteringComponentsTest extends
 		CustomComponentWithLifecycleInTheClasspath component = getFromContainer(CustomComponentWithLifecycleInTheClasspath.class);
 		assertThat(component.getCallsToPreDestroy(), is(equalTo(0)));
 		shutdownCDIContainer();
-		assertThat(component.getCallsToPreDestroy(), is(equalTo(1)));
 		startCDIContainer();
+		assertThat(component.getCallsToPreDestroy(), is(equalTo(1)));
 	}
 
 	@Override
@@ -194,9 +194,9 @@ public class CDIProviderRegisteringComponentsTest extends
 		ComponentFactoryInTheClasspath componentFactory = getFromContainer(ComponentFactoryInTheClasspath.class);
 		assertThat(componentFactory.getCallsToPreDestroy(), is(equalTo(0)));
 		shutdownCDIContainer();
+		startCDIContainer();
 		assertThat(componentFactory.getCallsToPreDestroy(), is(equalTo(1)));
 
-		startCDIContainer();
 	}
 	
 	@Ignore

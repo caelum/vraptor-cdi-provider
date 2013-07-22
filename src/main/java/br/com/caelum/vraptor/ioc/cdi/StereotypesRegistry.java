@@ -6,6 +6,8 @@ import java.util.Set;
 import javax.enterprise.inject.spi.Bean;
 import javax.enterprise.inject.spi.BeanManager;
 
+import org.jboss.weld.ContainerState;
+
 import br.com.caelum.vraptor.ioc.StereotypeHandler;
 
 public class StereotypesRegistry {
@@ -17,7 +19,7 @@ public class StereotypesRegistry {
 	}
 	
 	public void configure(){
-		ArrayList<StereotypeHandler> stereotypesHandler = new ArrayList<StereotypeHandler>();		
+		ArrayList<StereotypeHandler> stereotypesHandler = new ArrayList<StereotypeHandler>();
 		Set<Bean<?>> stereotypeBeans = beanManagerUtil.getBeans(StereotypeHandler.class);
 		for (Bean<?> bean : stereotypeBeans) {
 			StereotypeHandler stereotype = (StereotypeHandler) beanManagerUtil.instanceFor(bean);

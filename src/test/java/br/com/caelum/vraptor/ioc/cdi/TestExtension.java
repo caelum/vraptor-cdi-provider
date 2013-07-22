@@ -4,6 +4,7 @@ import java.util.Set;
 
 import javax.enterprise.context.spi.CreationalContext;
 import javax.enterprise.event.Observes;
+import javax.enterprise.inject.spi.AfterDeploymentValidation;
 import javax.enterprise.inject.spi.BeanManager;
 import javax.enterprise.inject.spi.BeforeBeanDiscovery;
 import javax.enterprise.inject.spi.Extension;
@@ -70,7 +71,7 @@ public class TestExtension implements Extension{
 		};
 
 		producer.setProducer(testProducer);
-	}
+	}	
 	
 
 }
