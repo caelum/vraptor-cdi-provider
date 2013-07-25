@@ -6,6 +6,7 @@ A Container Provider for VRaptor 3 based on CDI 1.1
 In order to use the CDI Provider with VRaptor you have to follow the steps below:
 
 1- Add the vraptor-cdi-provider entry in your pom.xml
+
 	<dependency>
 		<groupId>br.com.caelum.vraptor</groupId>
 		<artifactId>vraptor-cdi-provider</artifactId>
@@ -13,6 +14,7 @@ In order to use the CDI Provider with VRaptor you have to follow the steps below
 	</dependency>
 	
 Configure the sonatype snapshots repository on your pom.xml
+
 	<repositories>
         	<repository>
         		<id>sonatype</id>
