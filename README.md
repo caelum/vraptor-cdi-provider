@@ -6,6 +6,24 @@ A Container Provider for VRaptor 3 based on CDI 1.1
 In order to use the CDI Provider with VRaptor you have to follow the steps below:
 
 1- Add the vraptor-cdi-provider entry in your pom.xml
+	<dependency>
+		<groupId>br.com.caelum.vraptor</groupId>
+		<artifactId>vraptor-cdi-provider</artifactId>
+		<version>1.0.0-SNAPSHOT</version>
+	</dependency>
+	
+Configure the sonatype snapshots repository on your pom.xml
+	<repositories>
+        	<repository>
+        		<id>sonatype</id>
+        		<snapshots>
+            			<enabled>true</enabled>
+            		</snapshots>
+            		<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            	</repository>
+	</repositories>
+
+Change VRaptor version to 3.5.2-SNAPSHOT.
 
 2- Configure the Provider in web.xml
 
@@ -66,8 +84,9 @@ Now you have to add the Alternative in beans.xml
 6- CDI implementations obligate you to use a Zero Args constructor for every bean that is non DependentScope. So instead
     of obligate users to create this constructor, a Java Agent is used to instrument all classes on the load time of 
     Server. This is the same approach used by other projects, like New Relic, JProfile, etc...
+    Download it here: https://github.com/caelum/vraptor-cdi-provider/blob/master/cdiagent.jar?raw=true
     
-7- Here are some links to guide you in order to enable the agent for your server    
+7- Here are some links to guide you in order to enable the agent for your server.    
 
 8- VRaptor provides some components that, maybe, are already provided for Application Servers. HttpServletRequest, 
     HttpSession. Other examples are Bean Validation classes, like Validator and ValidatorFactory. In oder to use Validator
