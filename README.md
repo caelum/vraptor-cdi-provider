@@ -34,7 +34,8 @@ Change VRaptor version to 3.5.2-SNAPSHOT.
 		<param-value>br.com.caelum.vraptor.ioc.cdi.CDIProvider</param-value>
 	</context-param>
 
-3- Configure the Listener that has to make BeanManager availabe in ServletContext
+3- Configure the Listener that has to make BeanManager availabe in ServletContext. If you are in a Servlet Container, this listener must be placed
+   after Weld Listener.
 
 	<listener>
 		<listener-class>br.com.caelum.vraptor.ioc.cdi.BeanManagerSetup</listener-class>
@@ -54,7 +55,7 @@ Change VRaptor version to 3.5.2-SNAPSHOT.
 
 5- If you want to override any VRaptor component you must use the @Alternative + @Priority annotations. For instance:
 
-	@Alternative @Priority(Interceptor.Priority.LIBRARY_AFTER)
+	@Alternative @Priority(Interceptor.Priority.APPLICATION)
 	public class CustomPathResolver extends DefaultPathResolver{
 	
 	  @Inject
@@ -68,22 +69,8 @@ Change VRaptor version to 3.5.2-SNAPSHOT.
 	  }
 	}
     
-Now you have to add the Alternative in beans.xml
-    
-	<?xml version="1.0" encoding="UTF-8"?>
-	<beans xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-	       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-	       xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
-	       http://xmlns.jcp.org/xml/ns/javaee/beans_1_1.xsd"
-	       version="1.1" bean-discovery-mode="all">
-	
-		<alternatives>
-		    <class>app.extension.CustomPathResolver</class>
-		</alternatives>
-	            
-	</beans>
 
-6- CDI implementations obligate you to use a Zero Args constructor for every bean that is non DependentScope. So instead
+6- CDI implementations obligate you to use a Zero Args constructor for every bean that is non Dependent Scope. So instead
     of obligate users to create this constructor, a Java Agent is used to instrument all classes on the load time of 
     Server. This is the same approach used by other projects, like New Relic, JProfile, etc...
     Download it here: https://github.com/caelum/vraptor-cdi-provider/blob/master/cdiagent.jar?raw=true
@@ -101,8 +88,7 @@ Now you have to add the Alternative in beans.xml
 
 9- List of tested servers
     * WildFly
-    * GlassFish4
     * Tomcat 7.0.x
-    * Jetty 9.
+    * Jetty 8.
    
    
