@@ -5,7 +5,7 @@
 	<groupId>br.com.caelum</groupId>
 	<artifactId>vraptor-cdi-provider</artifactId>
 	<packaging>jar</packaging>
-	<version>1.0.0</version>
+	<version>1.0.1-SNAPSHOT</version>
 
 	<parent>
 		<groupId>org.sonatype.oss</groupId>
