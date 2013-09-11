@@ -10,22 +10,17 @@ In order to use the CDI Provider with VRaptor you have to follow the steps below
 	<dependency>
 		<groupId>br.com.caelum.vraptor</groupId>
 		<artifactId>vraptor-cdi-provider</artifactId>
-		<version>1.0.0-SNAPSHOT</version>
+		<version>1.0.0</version>
 	</dependency>
-	
-Configure the sonatype snapshots repository on your pom.xml
 
-	<repositories>
-        	<repository>
-        		<id>sonatype</id>
-        		<snapshots>
-            			<enabled>true</enabled>
-            		</snapshots>
-            		<url>https://oss.sonatype.org/content/repositories/snapshots/</url>
-            	</repository>
-	</repositories>
+Change VRaptor version to 3.5.2 with cdi classifier.
 
-Change VRaptor version to 3.5.2-SNAPSHOT.
+	<dependency>
+		<groupId>br.com.caelum.vraptor</groupId>
+		<artifactId>vraptor</artifactId>
+		<version>3.5.2</version>
+		<classifier>cdi</classifier>
+	</dependency>
 
 2- Configure the Provider in web.xml
 
@@ -42,7 +37,7 @@ Change VRaptor version to 3.5.2-SNAPSHOT.
 	</listener>
     
 
-4- Create the beans.xml file in WEB-INf folder as follow:
+4- Create the beans.xml file in WEB-INF:
 
 	<?xml version="1.0" encoding="UTF-8"?>
 	<beans xmlns="http://xmlns.jcp.org/xml/ns/javaee"
@@ -75,7 +70,9 @@ Change VRaptor version to 3.5.2-SNAPSHOT.
     Server. This is the same approach used by other projects, like New Relic, JProfile, etc...
     Download it here: https://github.com/caelum/vraptor-cdi-provider/blob/master/cdiagent.jar?raw=true
     
-7- Here are some links to guide you in order to enable the agent for your server.    
+7- To enable the CDI agent, you have to provide this VM argument when starting up the server:
+
+    -javaagent:path/to/cdiagent.jar
 
 8- VRaptor provides some components that, maybe, are already provided for Application Servers. HttpServletRequest, 
     HttpSession. Other examples are Bean Validation classes, like Validator and ValidatorFactory. In oder to use Validator
@@ -90,5 +87,3 @@ Change VRaptor version to 3.5.2-SNAPSHOT.
     * WildFly
     * Tomcat 7.0.x
     * Jetty 8.
-   
-   
