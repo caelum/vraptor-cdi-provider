@@ -84,6 +84,7 @@ Change VRaptor version to 3.5.2 with cdi classifier.
     </alternatives>
 
 9- List of tested servers
-    * WildFly
-    * Tomcat 7.0.x
-    * Jetty 8.
+
+- WildFly
+- Tomcat 7.0.x
+- Jetty 8.
