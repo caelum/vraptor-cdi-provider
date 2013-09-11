@@ -19,6 +19,12 @@
 	<description>VRaptor CDI Provider</description>
   <url>https://github.com/caelum/vraptor-cdi-provider</url>
 
+	<scm>
+		<url>http://github.com/caelum/vraptor-cdi-provider</url>
+		<connection>scm:git:git://github.com/caelum/vraptor-cdi-provider</connection>
+		<developerConnection>scm:git:git@github.com:caelum/vraptor-cdi-provider.git</developerConnection>
+	</scm>
+
   <dependencies>
     <dependency>
       <groupId>br.com.caelum</groupId>
