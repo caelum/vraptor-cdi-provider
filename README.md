@@ -14,12 +14,12 @@ In order to use the CDI Provider with VRaptor you have to follow the steps below
 </dependency>
 ```
 
-Change VRaptor version to 3.5.2 with cdi classifier.
+Change VRaptor version to 3.5.3 with cdi classifier.
 ```xml
 <dependency>
 	<groupId>br.com.caelum.vraptor</groupId>
 	<artifactId>vraptor</artifactId>
-	<version>3.5.2</version>
+	<version>3.5.3</version>
 	<classifier>cdi</classifier>
 </dependency>
 ```
